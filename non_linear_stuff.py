@@ -1,5 +1,5 @@
 import math
-import numpy as np
+#import numpy as np
 
 eps = 0.1
 L_dlina = 0.1
@@ -89,7 +89,7 @@ def getGoldenRationResult(a, b, k, a1, b1, L_dlina, eps):
             b = Mu
             Mu = Lambda
             Lambda = a - (1 - teta) * (b - a)
-            FKLamb = (4*(Mu**2-2*Mu-8)*(Mu**2-9))/(Mu**2-Mu**4)
+            FKLamb = (4*(Lambda**2-2*Lambda-8)*(Lambda**2-9))/(Lambda**2-Lambda**4)
         teta_res = teta
         teta = ((b - a) / (b_act - a_act))
     else:
@@ -98,6 +98,13 @@ def getGoldenRationResult(a, b, k, a1, b1, L_dlina, eps):
         NNN = (math.log((b1 - a1) / L_dlina) / math.log((math.sqrt(5) - 1) / 2))
         print('Result is: {: >43} \nIterations calculated: {: >16} \nIterations by formula: {: >16}'.format(result, k, math.trunc(NNN)))
         print('Length by calculated values: {: >16.5} \nLength by formula: {: >26.5}'.format(b-a, teta_res))
+        print('a = {:}, b = {:}'.format(a, b))
+# def getFiboResult (a, b, k, a1, b1, L_dlina, eps):
+#    Lambda = (a + ((getFiboNum((b - a) - k - 1)) / (getFiboNum((b - a) - k + 1)) * (b - a)))
+#    Mu = (a + ((getFiboNum((b - a) - k)) / (getFiboNum((b - a) - k + 1)) * (b - a))
+#    NNN = ((b - a) / getFiboNum(b - a)
+#    FKMu = (4*(Mu**2-2*Mu-8)*(Mu**2-9))/(Mu**2-Mu**4)
+#    FKLamb = (4*(Lambda**2-2*Lambda-8)*(Lambda**2-9))/(Lambda**2-Lambda**4)
 
 getDixotomicResult (a, b, k, a1, b1, L_dlina, eps)
 getGoldenRationResult (a, b, k, a1, b1, L_dlina, eps)
