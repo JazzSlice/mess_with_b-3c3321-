@@ -1,110 +1,79 @@
 import math
-#import numpy as np
 
 eps = 0.1
-L_dlina = 0.1
+target = 0.1
 a = -7
 b = -3 
-k = 1
 
 a1 = a
 b1 = b
 
+fibo_arr = [1, 1]
 
-def getDixotomicResult (a, b, k, a1, b1, L_dlina, eps):
+def getFiboNum (k):
+    i = k - 1
+    if fibo_arr[i] != 1:
+        fibo_arr[i] = fibo_arr[i - 1] + fibo_arr[i - 2]
+    return fibo_arr[i]
 
-    while b - a > L_dlina: 
-        
-        Lambda = (a + b)/2 - eps 
-        Mu = (a + b)/2 + eps 
-        
-        FKLamb = (4*(Lambda**2-2*Lambda-8)*(Lambda**2-9))/(Lambda**2-Lambda**4)
-        FKMu = (4*(Mu**2-2*Mu-8)*(Mu**2-9))/(Mu**2-Mu**4)
-
-        
-        print ("кол-во итераций: ",k)
-        print ("а и б: ",a, b)
-        print ("в функциях лямбва и мю: ",FKLamb, FKMu)
-
-        if FKLamb < FKMu:
-            if b - Mu > eps :
-                
-                a = a
-                b = Mu 
-            else:
-                break 
-        else:
-            if a - Lambda > eps :
-                
-                a = Lambda
-                b = b  
-            else:
-                break 
-            
-        k += 1
+def getFooRes (x, num):
+    if num == 1:
+        x = (4 * ((x**2 - 2*x - 8) * (x**2 - 9)) / (x**2 - x**4))
+    else:
+        x = (x**3 + 2*(x**2) - x + 2)
+    return x
 
 
-
-        if k == 20: 
-            break
-
-
-    else: 
-        print ("complete")
-    #    k += 1
-    #    print (a, b)
-        print ("real KKK:", k)
-
-    DlinaUnn = ((1/2**k)*(b-a)) + (2*eps)*(1-(1/2**k))
-
-    print ("длина неопределенности: ", DlinaUnn)
-
-    pupu = (b1-a1)/DlinaUnn
-
-    print ("pupu is ", pupu)
-
-    NNN = math.log(pupu)/math.log(2)
-
-    print ("кол-во итераций NNN", NNN)
-
-def getGoldenRationResult(a, b, k, a1, b1, L_dlina, eps):
+def getGoldenRatioRes (a, b):
+    k = 0
     teta = ((math.sqrt(5) - 1) / 2)
-    teta_res = teta
-    Lambda = (a + (1 - teta) * (b - a))
-    Mu = (a + teta * (b - a))
-    FKLamb = (4 * (Lambda**2 - 2 * Lambda - 8) * (Lambda**2 - 9)) / (Lambda**2 - Lambda**4)
-    FKMu = (4 * (Mu**2 - 2 * Mu - 8) * (Mu**2 - 9)) / (Mu**2 - Mu**4)
-    result = 0
-    while (b - a > L_dlina):
-        if FKLamb > FKMu:
-            a_act = a
-            b_act = b
+    
+    while b - a > target:
+        k += 1
+        Lambda = (a + (1 - teta) * (b - a))
+        Mu = (a + teta * (b - a))
+        FLamb = getFooRes(Lambda, 1)
+        FMu = getFooRes(Mu, 1)
+        if FLamb > FMu:
             a = Lambda
+            b = b
             Lambda = Mu
-            Mu = a + (teta * (b - a))
-            FKMu = (4*(Mu**2-2*Mu-8)*(Mu**2-9))/(Mu**2-Mu**4)
+            Mu = (a + teta * (b - a))
+            FMu = getFooRes(Mu, 1)
         else:
-            a_act = a
-            b_act = b
+            a = a
             b = Mu
             Mu = Lambda
-            Lambda = a - (1 - teta) * (b - a)
-            FKLamb = (4*(Lambda**2-2*Lambda-8)*(Lambda**2-9))/(Lambda**2-Lambda**4)
-        teta_res = teta
-        teta = ((b - a) / (b_act - a_act))
-    else:
-        result = ((a + b) / 2)
-        k += 1
-        NNN = (math.log((b1 - a1) / L_dlina) / math.log((math.sqrt(5) - 1) / 2))
-        print('Result is: {: >43} \nIterations calculated: {: >16} \nIterations by formula: {: >16}'.format(result, k, math.trunc(NNN)))
-        print('Length by calculated values: {: >16.5} \nLength by formula: {: >26.5}'.format(b-a, teta_res))
-        print('a = {:}, b = {:}'.format(a, b))
-# def getFiboResult (a, b, k, a1, b1, L_dlina, eps):
-#    Lambda = (a + ((getFiboNum((b - a) - k - 1)) / (getFiboNum((b - a) - k + 1)) * (b - a)))
-#    Mu = (a + ((getFiboNum((b - a) - k)) / (getFiboNum((b - a) - k + 1)) * (b - a))
-#    NNN = ((b - a) / getFiboNum(b - a)
-#    FKMu = (4*(Mu**2-2*Mu-8)*(Mu**2-9))/(Mu**2-Mu**4)
-#    FKLamb = (4*(Lambda**2-2*Lambda-8)*(Lambda**2-9))/(Lambda**2-Lambda**4)
+            Lambda = (a - (1 - teta) * (b - a))
+            FMu = getFooRes(Mu, 1)
 
-getDixotomicResult (a, b, k, a1, b1, L_dlina, eps)
-getGoldenRationResult (a, b, k, a1, b1, L_dlina, eps)
+    i2target = (math.log((b1 - a1) / target) / math.log(teta))
+
+    print("_______GOLDEN_RATIO_RESULT_______")
+    print("x in bounds of [{:}:{:}]\nResult is: {: >37}".format(a, b, ((a + b) / 2)))
+    print('Iterations calculated: {: >9} \nIterations for target: {: >9}'.format(k, -math.floor(i2target)))
+    print('Length by calculated values: {: >10.5} \nLength by formula: {: >17.5}'.format(b-a, target/(b1-a1)))
+
+def getDixotomicRes (a, b):
+    k = 0
+    while b - a > target:
+        k += 1
+        Lambda = (((a + b) / 2) - eps)
+        Mu = (((a + b) / 2) + eps)
+        FLamb = getFooRes(Lambda, 1)
+        FMu = getFooRes(Mu, 1)
+        if FLamb > FMu:
+            a = Mu
+        else:
+            b = Lambda
+    k += 1
+    i2target = (math.log((b1 - a1) / target) / math.log(2))
+    
+    print("________DIXOTOMIC_RESULT_________")
+    print("x in bounds of [{:}:{:}]\nResult is: {: >27}".format(a, b, ((a + b) / 2)))
+    print('Iterations calculated: {: >9} \nIterations for target: {: >9}'.format(k, math.floor(i2target)))
+    print('Length by calculated values: {: >8.5} \nLength by formula: {: >17.5}'.format(b-a, eps/(b1-a1)))
+
+
+getGoldenRatioRes (a, b)
+getDixotomicRes (a, b)
