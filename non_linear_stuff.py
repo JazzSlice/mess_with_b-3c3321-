@@ -12,10 +12,10 @@ b1 = b
 fibo_arr = [1, 1]
 
 def getFiboNum (k):
-    i = k - 1
-    if fibo_arr[i] != 1:
-        fibo_arr[i] = fibo_arr[i - 1] + fibo_arr[i - 2]
-    return fibo_arr[i]
+    a, b = 0, 1
+    for i in range(k):
+        a, b = b, a + b
+    return a
 
 def getFooRes (x, num):
     if num == 1:
@@ -75,33 +75,36 @@ def getDixotomicRes (a, b):
     print('Iterations calculated: {: >9} \nIterations for target: {: >9}'.format(k, math.trunc(i2target)))
     print('Length by calculated values: {: >8.5} \nLength by formula: {: >17.5}'.format(b-a, target/(b1-a1)))
 
-def getFiboRes ():
-    k = 0
+def getFiboRes (a, b):
+    k, i, n = 0
     i2target = ((b1 - a1) / target)
-    while k < i2target:
+    while i < i2target:
+        n += 1
+        i = getFiboNum(n)
+
+    while k < n:
         k += 1
-        Lambda = (a + (getFiboNum(len(fibo_arr) - k - 1) / getFiboNum(len(fibo_arr) - k + 1) * (b - a)))
-        Mu = (a + (getFiboNum(len(fibo_arr) - k) / getFiboNum(len(fibo_arr) - k + 1) * (b - a)))
+        Lambda = (a + (getFiboNum(n - k - 1) / getFiboNum(n - k + 1) * (b - a)))
+        Mu = (a + (getFiboNum(n - k) / getFiboNum(n - k + 1) * (b - a)))
         FLamb = getFooRes(Lambda, 1)
         FMu = getFooRes(Mu, 1)
         if FLamb > FMu:
-            if k != (len(fibo_arr) - 2):
+            if k != (n - 2):
                 a = Lambda
                 Lambda = Mu
-                Mu = (a + (getFiboNum(len(fibo_arr) - k - 1) / getFiboNum(len(fibo_arr) - k) * (b - a)))
+                Mu = (a + (getFiboNum(n - k - 1) / getFiboNum(n - k) * (b - a)))
                 FMu = getFooRes(Mu, 1)
             else:
                 break
         else:
-            if k != (len(fibo_arr) - 2):
+            if k != (n - 2):
                 b = Mu
                 Mu = Lambda
-                Lambda = (a + (getFiboNum(len(fibo_arr) - k - 2) / getFiboNum(len(fibo_arr) - k) * (b - a)))
+                Lambda = (a + (getFiboNum(n - k - 2) / getFiboNum(n - k) * (b - a)))
                 FLamb = getFooRes(Lambda, 1)
             else:
                 break
-        Lambda = 
-        # check case: out of fibo_arr 'n' index in 'k != ' condition
+    Lambda = 
 
 
 getGoldenRatioRes (a, b)
