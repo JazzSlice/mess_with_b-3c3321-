@@ -7,6 +7,7 @@ b = -3
 
 a1 = a
 b1 = b
+teta = ((math.sqrt(5) - 1) / 2)
 
 dixotomicRes = []
 goldenRes = []
@@ -15,6 +16,18 @@ fiboRes = []
 class iter_info:
     def __init__(self, k):
         self.k = k
+    def getInfo(self):
+        print("|{: >13.4f}|{: >13.4f}|{: >14.4f}|{: >12.4f}|{: >15.4f}|{: >14.4f}|".format(self.a, self.b, self.Lambda, self.Mu, self.FLamb, self.FMu))
+    def calc(self, method):
+        match method:
+            case 'dixo':
+                self.Lambda = (((self.a + self.b) / 2) - eps)
+                self.Mu = (((self.a + self.b) / 2) + eps)
+            case 'gold':
+                self.Lambda = (self.a + (1 - teta) * (self.b - self.a))
+                self.Mu = (self.a + teta * (self.b - self.a))
+        self.FLamb = getFooRes(self.Lambda, 1)
+        self.FMu = getFooRes(self.Mu, 1)
 
 def getFiboNum (k):
     a, b = 0, 1
@@ -30,16 +43,26 @@ def getFooRes (x, num):
             x = (x**3 + 2*(x**2) - x + 2)
     return x
 
-def printRes (arr):
+def printRes (arr, method):
+    obj = arr[(len(arr) - 1)]
+    match method:
+        case 'dixo':
+            i2target = (math.log((b1 - a1) / target) / math.log(2))
+            print("___________________DIXOTOMIC_RESULT___________________")
+        case 'gold':
+            i2target = (math.log((b1 - a1) / target) / math.log(teta))
+            print("_________________GOLDEN_RATIO_RESULT__________________")
+        
+    print("x in bounds of                 [{:}:{:}]\nResult is: {: >27}".format(obj.a, obj.b, ((obj.a + obj.b) / 2)))
+    print('Iterations calculated: {: >9} \nIterations for target: {: >9}'.format(obj.k, math.trunc(i2target)))
+    print('Length by calculated values: {: >8.5} \nLength by formula: {: >17.5}'.format(obj.b-obj.a, target/(b1-a1)))
     print("|      a      |      b      |    lambda    |     mu     |   F(lambda)   |     F(mu)    |")
     print("----------------------------------------------------------------------------------------")
     for i in range(len(arr)):
-        obj = arr[i]
-        print("|{: >13.4f}|{: >13.4f}|{: >14.4f}|{: >12.4f}|{: >15.4f}|{: >14.4f}|".format(obj.a, obj.b, obj.Lambda, obj.Mu, obj.FLamb, obj.FMu))
-
-def getGoldenRatioRes (a, b):
+        arr[i].getInfo()
+        
+def getGoldenRatioRes (a, b): # NEED REBUILD FOR OJECTS
     k = 0
-    teta = ((math.sqrt(5) - 1) / 2)
     
     while b - a > target:
         k += 1
@@ -69,39 +92,25 @@ def getGoldenRatioRes (a, b):
 
 def getDixotomicRes (a, b):
     k = 0
+    method = 'dixo'
     dixotomicRes.append(iter_info(k))
     arr = dixotomicRes[k]
-    arr.a = a
-    arr.b = b
-    while arr.b - arr.a > target:
+    arr.a, arr.b = a, b
+    while b - a > target:
         dixotomicRes.append(iter_info(k + 1))
         arr1 = dixotomicRes[k+1]
-        arr.Lambda = (((arr.a + arr.b) / 2) - eps)
-        arr.Mu = (((arr.a + arr.b) / 2) + eps)
-        arr.FLamb = getFooRes(arr.Lambda, 1)
-        arr.FMu = getFooRes(arr.Mu, 1)
-        print(dixotomicRes)
+        arr.calc(method)
         if arr.FLamb > arr.FMu:
-            arr1.a = arr.Mu
-            arr1.b = arr.b
+            arr1.a, arr1.b = arr.Mu, arr.b
         else:
-            arr1.a = arr.a
-            arr1.b = arr.Lambda
+            arr1.a, arr1.b = arr.a, arr.Lambda
         k += 1
+        a, b = arr1.a, arr1.b
         arr = dixotomicRes[k]
-    arr.Lambda = (((arr.a + arr.b) / 2) - eps)
-    arr.Mu = (((arr.a + arr.b) / 2) + eps)
-    arr.FLamb = getFooRes(arr.Lambda, 1)
-    arr.FMu = getFooRes(arr.Mu, 1)
+    arr.calc(method)
+    printRes(dixotomicRes, method)
 
-    i2target = (math.log((b1 - a1) / target) / math.log(2))
-    
-    print("___________________DIXOTOMIC_RESULT___________________")
-    print("x in bounds of                 [{:}:{:}]\nResult is: {: >27}".format(arr.a, arr.b, ((arr.a + arr.b) / 2)))
-    print('Iterations calculated: {: >9} \nIterations for target: {: >9}'.format(k, math.trunc(i2target)))
-    print('Length by calculated values: {: >8.5} \nLength by formula: {: >17.5}'.format(arr.b-arr.a, target/(b1-a1)))
-    printRes(dixotomicRes)
-
+# NECESSARY TO ADD 5-TH STEP & REBUILD FOR OBJECTS
 # def getFiboRes (a, b):
 #     k, i, n = 0
 #     i2target = ((b1 - a1) / target)
