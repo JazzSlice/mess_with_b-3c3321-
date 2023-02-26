@@ -1,18 +1,21 @@
 import math
 
-eps = 0.1
-target = 0.1
-a = -7
-b = -3
+eps = 0.01
+target = 0.01
+a = -1
+b = 4
 
 a1 = a
 b1 = b
+foo = 2
 teta = ((math.sqrt(5) - 1) / 2)
 goldFlag = 0
 
-dixotomicRes = []
-goldenRes = []
-fiboRes = []
+results = {
+    'dixotomicRes': [],
+    'goldenRes': [],
+    'fiboRes': []
+}
 
 class iter_info:
     def __init__(self, k):
@@ -33,8 +36,11 @@ class iter_info:
                         self.Mu = (self.a + teta * (self.b - self.a))
                     case 2:
                         self.Lambda = (self.a + (1 - teta) * (self.b - self.a))
-        self.FLamb = getFooRes(self.Lambda, 1)
-        self.FMu = getFooRes(self.Mu, 1)
+            case 'fibo':
+                self.Lambda = (self.a + getFiboNum(self.n - self.k - 3) / getFiboNum(self.n - self.k -1))
+            
+        self.FLamb = getFooRes(self.Lambda, foo)
+        self.FMu = getFooRes(self.Mu, foo)
 
 def getFiboNum (k):
     a, b = 0, 1
@@ -57,11 +63,14 @@ def printRes (arr, method):
             i2target = (math.log((b1 - a1) / target) / math.log(2))
             print("______________DIXOTOMIC_RESULT_______________")
         case 'gold':
-            i2target = (math.log((b1 - a1) / target) / math.log(teta))
+            i2target = (math.log((b1 - a1) / target) / math.log(teta)) # could use //
             print("_____________GOLDEN_RATIO_RESULT_____________")
+        case 'fibo':
+            i2target = ((b1 - a1) / target)
+            print("___________FIBONACCI_RATIO_RESULT____________")
         
     print("x in bounds of{: >23.4f}:{:.4f}\nResult is: {: >26.4f}".format(obj.a, obj.b, ((obj.a + obj.b) / 2)))
-    print('Iterations calculated: {: >9} \nIterations for target: {: >9}'.format(len(arr), math.trunc(i2target)))
+    print('Iterations calculated: {: >9} \nIterations for target: {: >9}'.format(len(arr), -math.floor(i2target)))
     print('Length by calculated values: {: >8.5} \nLength by formula: {: >17.5}'.format(obj.b-obj.a, target/(b1-a1)))
     print("----------------------------------------------------------------------------------------")
     print("|      a      |      b      |    lambda    |     mu     |   F(lambda)   |     F(mu)    |")
@@ -72,12 +81,13 @@ def printRes (arr, method):
 def getGoldenRatioRes (a, b):
     k = 0
     method = 'gold'
-    goldenRes.append(iter_info(k))
-    arr = goldenRes[k]
+    res = results['goldenRes']
+    res.append(iter_info(k))
+    arr = res[k]
     arr.a, arr.b = a, b
     while b - a > target:
-        goldenRes.append(iter_info(k + 1))
-        arr1 = goldenRes[k + 1]
+        res.append(iter_info(k + 1))
+        arr1 = res[k + 1]
         arr.calc(method)
         if arr.FLamb > arr.FMu:
             goldFlag = 1
@@ -90,63 +100,83 @@ def getGoldenRatioRes (a, b):
             arr1.Mu = arr.Lambda
             arr1.calc(method)
         k += 1
-        arr = goldenRes[k]
+        arr = res[k]
         a, b = arr.a, arr.b
     arr.calc(method)
-    printRes(goldenRes, method)
+    printRes(res, method)
 
 def getDixotomicRes (a, b):
     k = 0
     method = 'dixo'
-    dixotomicRes.append(iter_info(k))
-    arr = dixotomicRes[k]
+    res = results['dixotomicRes']
+    res.append(iter_info(k))
+    arr = res[k]
     arr.a, arr.b = a, b
     while b - a > target:
-        dixotomicRes.append(iter_info(k + 1))
-        arr1 = dixotomicRes[k + 1]
+        res.append(iter_info(k + 1))
+        arr1 = res[k + 1]
         arr.calc(method)
         if arr.FLamb > arr.FMu:
             arr1.a, arr1.b = arr.Mu, arr.b
         else:
             arr1.a, arr1.b = arr.a, arr.Lambda
         k += 1
-        arr = dixotomicRes[k]
+        arr = res[k]
         a, b = arr.a, arr.b
     arr.calc(method)
-    printRes(dixotomicRes, method)
+    printRes(res, method)
 
-# def getFiboRes (a, b):
-#     k, i, n = 0
-#     i2target = ((b1 - a1) / target)
-#     while i < i2target:
-#         n += 1
-#         i = getFiboNum(n)
+def getFiboRes (a, b):
+    k, i, n = 0, 0, 0
+    i2target = ((b1 - a1) / target)
+    while i < i2target:
+        n += 1
+        i = getFiboNum(n)
 
-#     while k < n:
-#         k += 1
-#         Lambda = (a + (getFiboNum(n - k - 1) / getFiboNum(n - k + 1) * (b - a)))
-#         Mu = (a + (getFiboNum(n - k) / getFiboNum(n - k + 1) * (b - a)))
-#         FLamb = getFooRes(Lambda, 1)
-#         FMu = getFooRes(Mu, 1)
-#         if FLamb > FMu:
-#             if k != (n - 2):
-#                 a = Lambda
-#                 Lambda = Mu
-#                 Mu = (a + (getFiboNum(n - k - 1) / getFiboNum(n - k) * (b - a)))
-#                 FMu = getFooRes(Mu, 1)
-#             else:
-#                 break
-#         else:
-#             if k != (n - 2):
-#                 b = Mu
-#                 Mu = Lambda
-#                 Lambda = (a + (getFiboNum(n - k - 2) / getFiboNum(n - k) * (b - a)))
-#                 FLamb = getFooRes(Lambda, 1)
-#             else:
-#                 break
-#     Lambda = 
-
-      
+    method = 'fibo'
+    res = results['fiboRes']
+    res.append(iter_info(k))
+    arr = res[k]
+    arr.a, arr.b, arr.n = a, b, n
+    arr.Lambda = (arr.a + ((getFiboNum(arr.n - 2)) / getFiboNum(arr.n)) * (arr.b - arr.a))
+    arr.Mu = (arr.a + (getFiboNum(arr.n -1) / getFiboNum(arr.n)) * (arr.b - arr.a))
+    arr.FLamb = getFooRes(arr.Lambda, foo)
+    arr.FMu = getFooRes(arr.Mu, foo)
+    for i in range(n):
+        res.append(iter_info(k + 1))
+        arr1 = res[k + 1]
+        if arr.FLamb > arr.FMu:
+            arr1.a, arr1.b, arr1.Lambda, arr1.n = arr.Lambda, arr.b, arr.Mu, arr.n
+            arr1.Mu = (arr1.a + (getFiboNum(arr1.n - k - 1)) / (getFiboNum(arr1.n - k)) * (arr1.b - arr1.a))
+            if arr1.k != (arr1.n - 2):
+                k += 1
+                arr = res[k]
+                arr.FMu = getFooRes(arr.Mu, foo)
+                arr.FLamb = getFooRes(arr.Lambda, foo)
+            else:
+                break
+        else:
+            arr1.a, arr1.b, arr1.Mu, arr1.n = arr.a, arr.Mu, arr.Lambda, arr.n
+            arr1.Lambda = (arr1.a + ((getFiboNum(arr1.n - k)) / getFiboNum(arr.n - arr.k + 1)) * (arr1.b - arr1.a))
+            if arr1.k != (arr1.n - 2):
+                k += 1
+                arr = res[k]
+                arr.FLamb = getFooRes(arr.Lambda, foo)
+                arr.FMu = getFooRes(arr.Mu, foo)
+            else:
+                break
+    arra = res[len(res) - 1]
+    arrp = res[len(res) - 2]
+    arra.Lambda = arrp.Lambda
+    arra.Mu = (arra.Lambda + eps)
+    arra.FLamb = getFooRes(arra.Lambda, foo)
+    arra.FMu = getFooRes(arra.Mu, foo)
+    if arra.FLamb > arra.FMu:
+        arra.a, arra.b = arra.Lambda, arrp.b
+    else:
+        arra.a, arra.b = arrp.a, arra.Mu
+    printRes(res, method)
 
 getGoldenRatioRes (a, b)
 getDixotomicRes (a, b)
+getFiboRes(a, b)
