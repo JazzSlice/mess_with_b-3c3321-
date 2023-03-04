@@ -67,17 +67,23 @@ def printRes (arr, method):
             print("_____________GOLDEN_RATIO_RESULT_____________")
         case 'fibo':
             i2target = ((b1 - a1) / target)
+            i, n = 0, 0
+            while i < i2target:
+                n += 1
+                i = getFiboNum(n)
+            i2target = n
             print("___________FIBONACCI_RATIO_RESULT____________")
         
     print("x in bounds of{: >23.4f}:{:.4f}\nResult is: {: >26.4f}".format(obj.a, obj.b, ((obj.a + obj.b) / 2)))
-    print('Iterations calculated: {: >9} \nIterations for target: {: >9}'.format(len(arr), -math.floor(i2target)))
+    print('Iterations calculated: {: >9} \nIterations for target: {: >9}'.format(len(arr), int(i2target)))
     print('Length by calculated values: {: >8.5} \nLength by formula: {: >17.5}'.format(obj.b-obj.a, target/(b1-a1)))
     print("----------------------------------------------------------------------------------------")
     print("|      a      |      b      |    lambda    |     mu     |   F(lambda)   |     F(mu)    |")
     print("----------------------------------------------------------------------------------------")
     for i in range(len(arr)):
-        arr[i].getInfo()
-        
+        arr[i].getInfo() 
+    print("----------------------------------------------------------------------------------------")
+    
 def getGoldenRatioRes (a, b):
     k = 0
     method = 'gold'

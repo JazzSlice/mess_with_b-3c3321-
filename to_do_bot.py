@@ -1,6 +1,6 @@
 import telebot
 
-token = <token>
+token = '6136659748:AAE0rp_aPRWRdskJTJ13pqw93M_NYFbc970'
 bot = telebot.TeleBot(token)
 help = """
 press:
