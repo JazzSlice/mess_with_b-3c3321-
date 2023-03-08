@@ -1,0 +1,5 @@
+fname = input()
+sname = input()
+tname = input()
+fp = min(fname, sname, tname)
+print(fp)
