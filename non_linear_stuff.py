@@ -89,11 +89,6 @@ def printRes (arr, method):
     print(f'{"":-^88}')
     for i in range(len(arr)):
         arr[i].getInfo()
-    z = ((obj.a + obj.b) / 2)
-    x = np.arange(z - eps, z + eps, eps)
-    y = (4 * ((x**2 - 2*x - 8) * (x**2 - 9)) / (x**2 - x**4))
-    plt.plot(x, y, color='blue')
-    plt.show()
 
 def getDixotomicRes (a, b):
     k = 0
@@ -199,5 +194,14 @@ def getGoldenRatioRes (a, b):
 getDixotomicRes (a, b)
 getGoldenRatioRes(a, b)
 getFiboRes(a, b)
+
+resd, resg, resf = results['dixotomicRes'], results['goldenRes'], results['fiboRes']
+a = max(resd[len(resd) - 1].a, resg[len(resg) - 1].a, resf[len(resf) - 1].a)
+b = min(resd[len(resd) - 1].b, resg[len(resg) - 1].b, resf[len(resf) - 1].b)
+z = ((a + b) / 2)
+x = np.arange(z - eps, z + eps, eps)
+y = (4 * ((x**2 - 2*x - 8) * (x**2 - 9)) / (x**2 - x**4))
+plt.plot(x, y, color='blue')
+plt.show()
 
 # file.close()
