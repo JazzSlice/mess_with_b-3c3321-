@@ -1,4 +1,6 @@
 import math
+import numpy as np
+import matplotlib.pyplot as plt
 
 eps = 0.01
 target = 0.01
@@ -23,7 +25,7 @@ class iter_info:
     def __init__(self, k):
         self.k = k
     def getInfo(self):
-        print("|{: >13.4f}|{: >13.4f}|{: >14.4f}|{: >12.4f}|{: >15.4f}|{: >14.4f}|".format(self.a, self.b, self.Lambda, self.Mu, self.FLamb, self.FMu))
+        print(f'|{self.a: >13.4f}|{self.b: >13.4f}|{self.Lambda: >14.4f}|{self.Mu: >12.4f}|{self.FLamb: >15.4f}|{self.FMu: >14.4f}|')
     def calc(self, method):
         match method:
             case 'dixo':
@@ -59,15 +61,15 @@ def getFooRes (x, num):
     return x
 
 def printRes (arr, method):
-    obj = arr[(len(arr) - 2)]
+    obj = arr[(len(arr) - 1)]
     match method:
         case 'dixo':
             txt = 'DIXOTOMIC_RESULT'
-            i2target = (math.log((b1 - a1) / target) / math.log(2))
+            i2target = (np.log((b1 - a1) / target) / np.log(2))
             print(f"{txt:_^88}")
         case 'gold':
             txt = 'GOLDEN_RATIO_RESULT'
-            i2target = (math.log((b1 - a1) / target) / math.log(teta))# could use //
+            i2target = (np.log((b1 - a1) / target) / np.log(teta))# could use //
             print(f"{txt:_^88}")
         case 'fibo':
             txt = 'FIBONACCI_RESULT'
@@ -80,13 +82,18 @@ def printRes (arr, method):
             print(f"{txt:_^88}")
         
     print("x in bounds of{: >23.4f}:{:.4f}\nResult is: {: >26.4f}".format(obj.a, obj.b, ((obj.a + obj.b) / 2)))
-    print('Iterations calculated: {: >9} \nIterations for target: {: >9}'.format(len(arr), math.floor(i2target)))
+    print(f'Iterations calculated: {len(arr): >9}')# \nIterations for target: {: >9}'.format(len(arr), math.floor(i2target)))
     print('Length by calculated values: {: >8.5f} \nLength by formula: {: >17.5f}'.format(obj.b-obj.a, target/(b1-a1)))
     print(f'{"":-^88}\n')
     print("|      a      |      b      |    lambda    |     mu     |   F(lambda)   |     F(mu)    |")
     print(f'{"":-^88}')
-    for i in range(len(arr) - 1):
+    for i in range(len(arr)):
         arr[i].getInfo()
+    z = ((obj.a + obj.b) / 2)
+    x = np.arange(z - eps, z + eps, eps)
+    y = (4 * ((x**2 - 2*x - 8) * (x**2 - 9)) / (x**2 - x**4))
+    plt.plot(x, y, color='blue')
+    plt.show()
 
 def getDixotomicRes (a, b):
     k = 0
@@ -106,6 +113,7 @@ def getDixotomicRes (a, b):
         k += 1
         arr = res[k]
         a, b = arr.a, arr.b
+    arr.a, arr.b = arr.b,arr.a
     arr.calc(method)
     printRes(res, method)
 
@@ -181,6 +189,7 @@ def getGoldenRatioRes (a, b):
             arr1.a, arr1.b = arr.a, arr.Mu
             arr1.Mu = arr.Lambda
             arr1.calc(method)
+        goldFlag = 0
         k += 1
         arr = res[k]
         a, b = arr.a, arr.b
