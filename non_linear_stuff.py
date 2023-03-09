@@ -81,10 +81,10 @@ def printRes (arr, method):
             i2target = n
             print(f"{txt:_^88}")
         
-    print("x in bounds of{: >23.4f}:{:.4f}\nResult is: {: >26.4f}".format(obj.a, obj.b, ((obj.a + obj.b) / 2)))
+    print(f'x in bounds of{obj.a: >23.4f}:{obj.b:.4f}\nResult is: {(obj.a + obj.b) / 2: >26.4f}')
     print(f'Iterations calculated: {len(arr): >9}')# \nIterations for target: {: >9}'.format(len(arr), math.floor(i2target)))
-    print('Length by calculated values: {: >8.5f} \nLength by formula: {: >17.5f}'.format(obj.b-obj.a, target/(b1-a1)))
-    print(f'{"":-^88}\n')
+    print('Length by calculated values: {: >7.3f} \nLength by formula: {: >17.3f}'.format(obj.b-obj.a, target/(b1-a1)))
+    print(f'{"":-^88}')
     print("|      a      |      b      |    lambda    |     mu     |   F(lambda)   |     F(mu)    |")
     print(f'{"":-^88}')
     for i in range(len(arr)):
@@ -200,7 +200,11 @@ a = max(resd[len(resd) - 1].a, resg[len(resg) - 1].a, resf[len(resf) - 1].a)
 b = min(resd[len(resd) - 1].b, resg[len(resg) - 1].b, resf[len(resf) - 1].b)
 z = ((a + b) / 2)
 x = np.arange(z - eps, z + eps, eps)
-y = (4 * ((x**2 - 2*x - 8) * (x**2 - 9)) / (x**2 - x**4))
+match foo:
+    case '1':
+        y = (4 * ((x**2 - 2*x - 8) * (x**2 - 9)) / (x**2 - x**4))
+    case '2':
+        y = (x**3 + 2*(x**2) - x + 2)
 plt.plot(x, y, color='blue')
 plt.show()
 
