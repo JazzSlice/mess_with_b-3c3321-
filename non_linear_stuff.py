@@ -2,14 +2,14 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-eps = 0.01
+eps = 0.001
 target = 0.01
 a = -1
-b = 0
+b = 4
 
 a1 = a
 b1 = b
-foo = '1'
+foo = '2'
 teta = ((math.sqrt(5) - 1) / 2)
 goldFlag = 0
 # file = open('test.pdf', 'a', encoding="utf-8")
@@ -151,7 +151,14 @@ def getFiboRes (a, b):
     for i in range(n):
         res.append(iter_info(k + 1))
         arr1 = res[k + 1]
-        if arr.FLamb > arr.FMu:
+        match foo:
+            case '1':
+                foper = arr.FLamb
+                soper = arr.FMu
+            case '2':
+                foper = arr.FMu
+                soper = arr.FLamb
+        if foper > soper:
             arr1.a, arr1.b, arr1.Lambda, arr1.n = arr.Lambda, arr.b, arr.Mu, arr.n
             arr1.Mu = (arr1.a + (getFiboNum(arr1.n - arr.k - 1)) / (getFiboNum(arr1.n - arr.k)) * (arr1.b - arr1.a))
             if (arr.k) != (arr.n - 2):
@@ -194,7 +201,14 @@ def getGoldenRatioRes (a, b):
         res.append(iter_info(k + 1))
         arr1 = res[k + 1]
         arr.calc(method)
-        if arr.FLamb > arr.FMu:
+        match foo:
+            case '1':
+                foper = arr.FLamb
+                soper = arr.FMu
+            case '2':
+                foper = arr.FMu
+                soper = arr.FLamb
+        if foper > soper:
             goldFlag = 1
             arr1.a, arr1.b = arr.Lambda, arr.b
             arr1.Lambda = arr.Mu
