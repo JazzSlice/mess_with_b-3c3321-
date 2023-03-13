@@ -89,6 +89,19 @@ def printRes (arr, method):
     print(f'{"":-^88}')
     for i in range(len(arr)):
         arr[i].getInfo()
+    
+    # resd, resg, resf = results['dixotomicRes'], results['goldenRes'], results['fiboRes']
+    # a = max(resd[len(resd) - 1].a, resg[len(resg) - 1].a, resf[len(resf) - 1].a)
+    # b = min(resd[len(resd) - 1].b, resg[len(resg) - 1].b, resf[len(resf) - 1].b)
+    z = ((obj.a + obj.b) / 2)
+    x = np.arange(z - eps, z + eps, eps)
+    match foo:
+        case '1':
+            y = (4 * ((x**2 - 2*x - 8) * (x**2 - 9)) / (x**2 - x**4))
+        case '2':
+            y = (x**3 + 2*(x**2) - x + 2)
+    plt.plot(x, y, color='blue')
+    plt.show()
 
 def getDixotomicRes (a, b):
     k = 0
@@ -101,7 +114,14 @@ def getDixotomicRes (a, b):
         res.append(iter_info(k + 1))
         arr1 = res[k + 1]
         arr.calc(method)
-        if arr.FLamb > arr.FMu:
+        match foo:
+            case '1':
+                foper = arr.FLamb
+                soper = arr.FMu
+            case '2':
+                foper = arr.FMu
+                soper = arr.FLamb
+        if foper > soper:
             arr1.a, arr1.b = arr.Mu, arr.b
         else:
             arr1.a, arr1.b = arr.a, arr.Lambda
@@ -194,18 +214,5 @@ def getGoldenRatioRes (a, b):
 getDixotomicRes (a, b)
 getGoldenRatioRes(a, b)
 getFiboRes(a, b)
-
-resd, resg, resf = results['dixotomicRes'], results['goldenRes'], results['fiboRes']
-a = max(resd[len(resd) - 1].a, resg[len(resg) - 1].a, resf[len(resf) - 1].a)
-b = min(resd[len(resd) - 1].b, resg[len(resg) - 1].b, resf[len(resf) - 1].b)
-z = ((a + b) / 2)
-x = np.arange(z - eps, z + eps, eps)
-match foo:
-    case '1':
-        y = (4 * ((x**2 - 2*x - 8) * (x**2 - 9)) / (x**2 - x**4))
-    case '2':
-        y = (x**3 + 2*(x**2) - x + 2)
-plt.plot(x, y, color='blue')
-plt.show()
 
 # file.close()
