@@ -2,14 +2,14 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-eps = 0.001
-target = 0.01
-a = -1
-b = 4
+eps = float(input('Введите эпсилон: ')) # 0.001
+target = float(input('Введите конечный интервал неопределенности: ')) # 0.01
+a = int(input('Введите границу "a": ')) # -1
+b = int(input('Введите границу "b": ')) # 4
 
 a1 = a
 b1 = b
-foo = '2'
+foo = input('Введите номер целевой функции: ') # '2'
 teta = ((math.sqrt(5) - 1) / 2)
 goldFlag = 0
 # file = open('test.pdf', 'a', encoding="utf-8")
@@ -80,7 +80,7 @@ def printRes (arr, method, fCalc):
                 i = getFiboNum(n)
             i2target = n
             print(f"{txt:_^93}")
-        
+
     print(f'x in bounds of{obj.a: >23.4f}:{obj.b:.4f}\nResult is: {(obj.a + obj.b) / 2: >26.4f}')
     print(f'Iterations calculated: {len(arr): >9}\nFoo Calculated: {fCalc: >16}')# \nIterations for target: {: >9}'.format(len(arr), math.floor(i2target)))
     print('Length by calculated values: {: >7.3f} \nLength by formula: {: >17.3f}'.format(obj.b-obj.a, target/(b1-a1)))
@@ -89,12 +89,21 @@ def printRes (arr, method, fCalc):
     print(f'{"":-^93}')
     for i in range(len(arr)):
         arr[i].getInfo()
-    
+    if obj.a > obj.b:
+        n = obj.a
+        obj.a = obj.b
+        obj.b = n
     # resd, resg, resf = results['dixotomicRes'], results['goldenRes'], results['fiboRes']
     # a = max(resd[len(resd) - 1].a, resg[len(resg) - 1].a, resf[len(resf) - 1].a)
     # b = min(resd[len(resd) - 1].b, resg[len(resg) - 1].b, resf[len(resf) - 1].b)
-    z = ((obj.a + obj.b) / 2)
-    x = np.arange(z - eps, z + eps, eps)
+    z = abs((obj.a + obj.b) / 2)
+    # x = np.arange(a1, b1, eps)
+    x = np.arange(obj.a - eps, obj.b + eps, eps)
+    # plt.axvline(x = a1)
+    # plt.axvline(x = b1)
+    plt.axvline(x = obj.a, color = 'black')
+    plt.axvline(x = obj.b, color = 'black')
+    
     y = getFooRes(x, foo)
     # match foo:
     #     case '1':
