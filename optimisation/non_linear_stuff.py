@@ -2,8 +2,8 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-eps = float(input('Введите эпсилон: ')) # 0.001
-target = float(input('Введите конечный интервал неопределенности: ')) # 0.01
+# eps = float(input('Введите эпсилон: ')) # 0.001
+# target = float(input('Введите конечный интервал неопределенности: ')) # 0.01
 a = int(input('Введите границу "a": ')) # -1
 b = int(input('Введите границу "b": ')) # 4
 
@@ -55,7 +55,7 @@ def getFiboNum (k):
 def getFooRes (x, num):
     match num:
         case '1':
-            x = (4 * ((x**2 - 2*x - 8) * (x**2 - 9)) / (x**2 - x**4))
+            x = (4 * ((x**2 - 2*x - 8) * (x**2 - 9)) / (x**2 - x**4 + 0.000001))
         case '2':
             x = (x**3 + 2*(x**2) - x + 2)
     return x
@@ -81,18 +81,21 @@ def printRes (arr, method, fCalc):
             i2target = n
             print(f"{txt:_^93}")
 
+    if obj.a > obj.b:
+        n = obj.a
+        obj.a = obj.b
+        obj.b = n
+
+    print(f'a = {a1} | b = {b1} | l = {target} | eps = {eps}')
     print(f'x in bounds of{obj.a: >23.4f}:{obj.b:.4f}\nResult is: {(obj.a + obj.b) / 2: >26.4f}')
     print(f'Iterations calculated: {len(arr): >9}\nFoo Calculated: {fCalc: >16}')# \nIterations for target: {: >9}'.format(len(arr), math.floor(i2target)))
     print('Length by calculated values: {: >7.3f} \nLength by formula: {: >17.3f}'.format(obj.b-obj.a, target/(b1-a1)))
+    print(f'Function result: {getFooRes((obj.a + obj.b) / 2, foo):^32.3f}')
     print(f'{"":-^93}')
     print("| k  |      a      |      b      |    lambda    |     mu     |   F(lambda)   |     F(mu)    |")
     print(f'{"":-^93}')
     for i in range(len(arr)):
         arr[i].getInfo()
-    if obj.a > obj.b:
-        n = obj.a
-        obj.a = obj.b
-        obj.b = n
     # resd, resg, resf = results['dixotomicRes'], results['goldenRes'], results['fiboRes']
     # a = max(resd[len(resd) - 1].a, resg[len(resg) - 1].a, resf[len(resf) - 1].a)
     # b = min(resd[len(resd) - 1].b, resg[len(resg) - 1].b, resf[len(resf) - 1].b)
@@ -180,7 +183,7 @@ def getFiboRes (a, b):
                 arr = res[k]
                 arr.FMu = getFooRes(arr.Mu, foo)
                 arr.FLamb = getFooRes(arr.Lambda, foo)
-                fCalc += 2
+                fCalc += 1
             else:
                 break
         else:
@@ -189,11 +192,9 @@ def getFiboRes (a, b):
             if (arr.k) != (arr.n - 2):
                 k += 1
                 arr = res[k]
-                if arr.Lambda == 1 or 1.0:
-                    arr.Lambda += eps
                 arr.FLamb = getFooRes(arr.Lambda, foo)
                 arr.FMu = getFooRes(arr.Mu, foo)
-                fCalc += 2
+                fCalc += 1
             else:
                 break
     arra = res[len(res) - 1]
@@ -202,6 +203,7 @@ def getFiboRes (a, b):
     arra.Mu = (arra.Lambda + eps)
     arra.FLamb = getFooRes(arra.Lambda, foo)
     arra.FMu = getFooRes(arra.Mu, foo)
+    fCalc += 1
     if arra.FLamb > arra.FMu:
         arra.a, arra.b = arra.Lambda, arrp.b
     else:
@@ -215,11 +217,12 @@ def getGoldenRatioRes (a, b):
     res.append(iter_info(k))
     arr = res[k]
     arr.a, arr.b = a, b
+    fCalc += 2
     while b - a > target:
         res.append(iter_info(k + 1))
         arr1 = res[k + 1]
         arr.calc(method)
-        fCalc += 2
+        fCalc += 0
         match foo:
             case '1':
                 foper = arr.FLamb
@@ -246,8 +249,31 @@ def getGoldenRatioRes (a, b):
     arr.calc(method)
     printRes(res, method, fCalc)
 
-getDixotomicRes (a, b)
-getGoldenRatioRes(a, b)
-getFiboRes(a, b)
+variables = {
+    '1' : [0.001, 0.01, a, b, foo],
+    '2' : [0.001, 0.1, a, b, foo],
+    '3' : [0.01, 0.1, a, b, foo],
+    '4' : [0.1, 0.1, a, b, foo]
+}
+
+for i in range(4):
+
+    var_path = variables[f'{i + 1}']
+    eps = var_path[0]
+    target = var_path[1]
+    a = var_path[2]
+    b = var_path[3]
+    foo = var_path[4]
+    print(variables[f'{i + 1}'])
+    getDixotomicRes (a, b)
+    getGoldenRatioRes(a, b)
+    getFiboRes(a, b)
+    results['dixotomicRes'] = []
+    results['goldenRes'] = []
+    results['fiboRes'] = []
+
+# getDixotomicRes(a, b)
+# getGoldenRatioRes(a, b)
+# getFiboRes(a, b)
 
 # file.close()
