@@ -1,0 +1,26 @@
+services:
+  app:
+    image: jazzslice/py_msg:1.11
+    ports:
+      - 80:80
+    networks:
+      - unode
+
+  zabbix-agent-app:
+    image: zabbix/zabbix-agent2:alpine-6.2-latest
+    container_name: zabbix-agent
+    hostname: zabbix-agent
+    ports:
+      - 10050:10050
+    environment:
+      ZBX_HOSTNAME: zabbix-agent
+      ZBX_SERVER_HOST: zabbix-server
+    links:
+      - zabbix-server:zabbix-server
+    networks:
+      - unode
+    depends_on:
+      - app
+
+networks:
+  unode:
