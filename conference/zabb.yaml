@@ -8,6 +8,7 @@ services:
     volumes:
       - /var/lib/zabbix/timezone:/etc/timezone
       - /var/lib/zabbix/localtime:/etc/localtime
+      - ./pgsql_base:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5432"]
       interval: 30s
@@ -47,6 +48,9 @@ services:
       ZBX_SERVER_HOST: zabbix-server
     links:
       - zabbix-server:zabbix-server
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    user: 0:0
     networks:
       monitoring:
         aliases:

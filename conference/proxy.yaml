@@ -1,0 +1,9 @@
+services:
+  zabbix-proxy:
+    image: zabbix/zabbix-proxy-sqlite3:alpine-6.2-latest
+    ports:
+      - 10061:10051
+    networks:
+      monitoring:
+    depends_on:
+      - zabbix-pestgres
