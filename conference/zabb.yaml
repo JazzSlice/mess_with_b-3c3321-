@@ -82,11 +82,21 @@ services:
     depends_on:
       - zabbix-server
   
+  grafana:
+    image: grafana/grafana:8.5.22
+    container_name: grafana
+    ports:
+      - 3000:3000
+    environment:
+      GF_INSTALL_PLUGINS: alexanderzobnin-zabbix-app
+    networks:
+      - monitoring
+  
   app:
     image: jazzslice/py_msg:1.11
     container_name: app
     ports:
-      - 3000:80
+      - 3030:80
     networks:
       - unode
 
