@@ -45,8 +45,23 @@ def createBUFolder (name='backup_folder', path='/'):
     print(info)
     print(response.text)
 
+def loadFile (path='/backup_folder', name='17_04_23', import_url='http://127.0.0.1/', import_name='db.json'):
+    import_url += import_name
+    path += f'{name}.json'
+    url = 'https://cloud-api.yandex.net/v1/disk/resources/upload?'
+    request_params = {
+        'path': path,
+        'url': import_url
+    }
+    request_headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': token
+    }
+    response = requests.put(url, headers=request_headers, params=request_params)
+    print(response.status_code)
 
-token = 'your AUTH-token'
+token = ''
 # url = 'https://cloud-api.yandex.net/v1/disk/resources?'
 
 # request_header = {
@@ -63,3 +78,4 @@ token = 'your AUTH-token'
 
 # print(response.status_code, response.text)
 createBUFolder()
+loadFile()
