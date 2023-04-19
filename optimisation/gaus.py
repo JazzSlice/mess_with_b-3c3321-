@@ -1,4 +1,3 @@
-
 import math
 
 eps = 0.001
@@ -19,8 +18,8 @@ results = {'goldenRes': []}
     
 def getFooRes (x1, x2, num):
     match num:
-        case '1':
-            x = (((-x1)**2) - ((-x2)**2) + (x1 * x2) - x1 + (x2 * 2))
+        case '1': # x1[0] += v_lamb * vector[0]
+            x = ((-x1) ** 2 - (x2 ** 2) + (x1 * x2) - x1 + (2 * x2))
         case '2':
             x = (x**3 + 2*(x**2) - x + 2)
     return x
@@ -87,13 +86,14 @@ def getGoldenRatioRes (a, b):
     return [x, getFooRes(x, x, foo)]
 #######################################
 
-
 for j in range(len(vectors)):
     vector = vectors[f'{j + 1}']
-    x2 = getGoldenRatioRes(x1[0], x1[0] + vector[0]) # нашли оптимальное значение для 1 шага
-    x2y = getGoldenRatioRes(x1[1], x1[1] + vector[1])
-    print(x2[0], x2[1])
-    print(x2y[0], x2y[1])
+    x2[j] = getFooRes(x1[j], x1[j] + vector[0], foo) # нашли оптимальное значение для 1 шага
+    # x2[j+1] = getFooRes(x1[1], x1[1] + vector[1], foo)
+x2x = getGoldenRatioRes(x1[0], x2[1])
+print(x2[0], x2[1])
+print(x2x[0], x2x[1])
+
 
 
 #######################################

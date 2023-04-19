@@ -102,7 +102,7 @@ def printRes (arr, method, fCalc):
     # z = abs((obj.a + obj.b) / 2)
     z = ((obj.a + obj.b) / 2)
     # x = np.arange(a1, b1, eps)
-    x = np.arange(obj.a - eps, obj.b + eps, eps)
+    x = np.arange(a, b, eps)
     # plt.axvline(x = a1)
     # plt.axvline(x = b1)
     plt.axvline(x = obj.a, color = 'black')
