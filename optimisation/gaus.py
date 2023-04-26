@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 oper = '0'
-foo = '3'
+foo = '4'
 teta = ((math.sqrt(5) - 1) / 2)
 target = 0.1
 eps = 0.1
@@ -41,7 +41,8 @@ def printRes (arr, method, fCalc, v, y1):
     # plt.axvline(x = obj.a, color = 'black')
     # plt.axvline(x = obj.b, color = 'black')
     # plt.axvline(x = z, color = 'red')
-    # y = obj.FLamb
+    # # y = (obj.FLamb)
+    # y = round(getFooRes((obj.a + obj.b) / 2, foo, v, y1), 8)
     # plt.plot(x, y, color='blue')
     # plt.show()
 
@@ -63,6 +64,17 @@ def getFooRes (x, num, v, y1):
                 # x2 = y
                 x = (((-x1)**2) - (((y + (x * v)))**2) + (x1 * (y + (x * v))) - x1 + ((y + (x * v)) * 2))
             # x = (y + (x * v))
+        case '4':
+            if oper == '0':
+                x2 = y1[1]
+                y = y1[0]
+                # x1 = y
+                x =  (((y + (x * v)) - x2)**2 + (x2 - 2)**2)
+            elif oper == '1':
+                x1 = y1[0]
+                y = y1[1]
+                # x2 = y
+                x = ((x1 - (y + (x * v)))**2 + ((y + (x * v)) - 2)**2)
     return x
 
 class iter_info:
@@ -116,6 +128,9 @@ def getGoldenRatioRes (a, b, vect, y1):
             case '3':
                 foper = arr.FLamb
                 soper = arr.FMu
+            case '4':
+                foper = arr.FLamb
+                soper = arr.FMu
         if foper > soper:
             goldFlag = 1
             fCalc += 1
@@ -137,44 +152,53 @@ def getGoldenRatioRes (a, b, vect, y1):
     results['goldenRes'] = []
     return [arr.Lambda, arr.FLamb]
 
-x1 = 0.0
+x1 = 1.0
 x2 = 0.0
 x = [x1, x2]
 xs = x
 vectors = {
-    '0': [0.0, 1.0],
-    '1': [1.0, 0.0]
+    '0': [1.0, 0.0],
+    '1': [0.0, 1.0]
 }
 y = x
 k = 0
 j = 0
 
 def printRess(k, x, fx, j, d, y, lamb, y1):
-    print(f'|  k  |  xk  |  j  |  dj  |  yj  |  labmj  |  yj+1  |')
-    print(f'|  {k}|  {x} | {j} |  {d} |  {y} | {lamb}  | {y1}   |')
+    # print(f'| k  |        xk       |  j  |    dj   |        yj       |  labmj  |       yj+1      |')
+    print(f'{"":-^86}')
+    if j == 1:
+        print(f'|{k:^4}| {x[0]: >7.4f}:{x[1]: >7.4f} | {j: >3.1f} | {d[0]: >3.1f}:{d[1]:.1f} | {y[0]: >7.4f}:{y[1]: >7.4f} | {lamb: >7.4f} | {y1[0]: >7.4f}:{y1[1]: >7.4f} |')
+    elif j == 2:
+        print(f'|{k:^4}| {fx: >15.4f} | {j: >3.1f} | {d[0]: >3.1f}:{d[1]:.1f} | {y[0]: >7.4f}:{y[1]: >7.4f} | {lamb: >7.4f} | {y1[0]: >7.4f}:{y1[1]: >7.4f} |')
+    # print(f'{"":-^86}')
 
 ang = 10
+print(f'| k  |        xk       |  j  |    dj   |        yj       |  labmj  |       yj+1      |')
+rng = 5
 while ang > eps:
     k += 1
     j += 1
-    lamb = getGoldenRatioRes(x[0] - 10, x[0] + 10, 1.0, y)
+    vec = vectors[f'{j-1}']
+    lamb = getGoldenRatioRes(x[j-1] - rng, x[j-1] + rng, 1.0, y)
     y[0] += lamb[0]
     fl = lamb[1]
     x = y
     d = vectors[f'{j - 1}']
-    # printRess(k, [x1, x2], fl, j, d, y, lamb, x)
-    print(f'x = {lamb[0], lamb[1]}')
+    printRess(k, [x1, x2], fl, j, d, y, lamb[0], x)
+    # print(f'x = {lamb[0], lamb[1]}')
 
     j += 1
-    lamb = getGoldenRatioRes(x[1] - 10, x[1] + 10, 1.0, y)
+    lamb = getGoldenRatioRes(x[j-1] - rng, x[j-1] + rng, 1.0, y)
     y[1] += lamb[0]
     fl = lamb[1]
     ang = abs(x1 - y[0]) + abs(x2 - y[1])
     x = y
     d = vectors[f'{j - 1}']
-    print(f'y = {lamb[0], lamb[1]}')
+    printRess(k, [x1, x2], fl, j, d, y, lamb[0], x)
+    # print(f'y = {lamb[0], lamb[1]}')
 
-    print(ang)
+    # print(ang)
     x1, x2 = y[0], y[1]
     j = 0
 
@@ -186,4 +210,3 @@ while ang > eps:
 # ang = abs(x1 - y[0]) + abs(x2 - y[1])
 # x = y
 # print(ang)
-
