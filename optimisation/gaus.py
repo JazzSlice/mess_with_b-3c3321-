@@ -6,7 +6,6 @@ oper = '0'
 foo = '2'
 teta = ((math.sqrt(5) - 1) / 2)
 target = 0.1
-# eps = 0.1
 results = {
     'goldenRes': []
 }
@@ -46,49 +45,6 @@ def printRes (arr, method, fCalc, v, y1):
     # plt.plot(x, y, color='blue')
     # plt.show()
 
-def getFooRes (x, num, v, y1):
-    match num:
-        case '1':
-            if oper == '0':
-                x2 = y1[1]
-                y = y1[0]
-                # x1 = y
-                x = ((((y + (x * v)))**2) - ((-x2)**2) + ((y + (x * v)) * x2) - (y + (x * v)) + (x2 * 2))
-            elif oper == '1':
-                x1 = y1[0]
-                y = y1[1]
-                # x2 = y
-                x = (((-x1)**2) - (((y + (x * v)))**2) + (x1 * (y + (x * v))) - x1 + ((y + (x * v)) * 2))
-            # x = (y + (x * v))
-        case '2':
-            if oper == '0':
-                x2 = y1[1]
-                y = y1[0]
-                # x1 = y
-                x =  (((y + (x * v)) - x2)**2 + (x2 - 2)**2)
-            elif oper == '1':
-                x1 = y1[0]
-                y = y1[1]
-                # x2 = y
-                x = ((x1 - (y + (x * v)))**2 + ((y + (x * v)) - 2)**2)
-    return x
-
-def evalFoo(lamb, foo, d, x):
-    lamb = lamb # later use in .replace magic method
-    foo = foo
-    # func = '(((-x1)**2) - (x2**2) + (x1 * x2) - x1 + (2 * x2))'
-    # func = '((x1 - x2)**2 + (x2 - 2)**2)'
-    func = '(9 * (x1**2) + 16 * (x2**2) - 90 * x1 - 128 * x2)'
-    x1 = '(x[0] + (lamb * d[0]))'
-    x2 = '(x[1] + (lamb * d[1]))'
-    func = func.replace('x1', x1)
-    func = func.replace('x2', x2)
-    func = func.replace('x[0]', str(x[0]))
-    func = func.replace('x[1]', str(x[1]))
-    func = func.replace('d[0]', str(d[0]))
-    func = func.replace('d[1]', str(d[1]))
-    # func = func.replace('lamb', str(lamb))
-    return round(eval(func), 4)
 
 class iter_info:
     def __init__(self, k):
@@ -102,20 +58,13 @@ class iter_info:
                     case 0:
                         self.Lambda = (self.a + (1 - teta) * (self.b - self.a))
                         self.Mu = (self.a + teta * (self.b - self.a))
-                        # print('count both')
                     case 1:
                         self.Mu = (self.a + teta * (self.b - self.a))
-                        # print('count MU')
                     case 2:
                         self.Lambda = (self.a + (1 - teta) * (self.b - self.a))
-                        # print('count lamb')
             
-        self.FLamb = evalFoo(self.Lambda, foo, v, y1)
-        self.FMu = evalFoo(self.Mu, foo, v, y1)
-        
-        
-        # self.FLamb = getFooRes(self.Lambda, foo)
-        # self.FMu = getFooRes(self.Mu, foo)
+        self.FLamb = getFoo(self.Lambda, v, y1, 'e')
+        self.FMu = getFoo(self.Mu, v, y1, 'e')
 
 def getGoldenRatioRes (vect, y1, rng):
     k, fCalc = 0, 0
@@ -134,8 +83,8 @@ def getGoldenRatioRes (vect, y1, rng):
         fCalc += 0
         match foo:
             case '1':
-                foper = arr.FLamb
-                soper = arr.FMu
+                foper = arr.FMu
+                soper = arr.FLamb
             case '2':
                 foper = arr.FLamb
                 soper = arr.FMu
@@ -156,18 +105,33 @@ def getGoldenRatioRes (vect, y1, rng):
         goldFlag = 0
         k += 1
         arr = res[k]
-        a, b = arr.a, arr.b
-    arr.calc(method, vect, y1, goldFlag)
+        if arr.a > arr.b:
+            arr.a, arr.b = arr.b, arr.a
+    # arr.calc(method, vect, y1, goldFlag)
     # printRes(res, method, fCalc, vect, y1)
     
-    return [round((abs(arr.a - arr.b)) / 2, 4), arr.Lambda]
+    return [round((abs(arr.a - arr.b)) / 2, roun), arr.Lambda]
 
-def getFoo(x):
-    x1 = x[0]
-    x2 = x[1]
-    # res = (((-x1)**2) - (x2**2) + (x1 * x2) - x1 + (2 * x2))
-    # res = ((x1 - x2)**2 + (x2 - 2)**2)
-    res = (9 * (x1**2) + 16 * (x2**2) - 90 * x1 - 128 * x2)
+def getFoo(lamb=0, d=[0,0], x=[0,0], goal='f'):
+    lamb = lamb
+    func = foon
+    match goal:
+        case 'f':
+            func = foon
+            func = func.replace('x1', str(x[0]))
+            func = func.replace('x2', str(x[1]))
+            res = round(eval(func), roun)
+        case 'e':
+            func1 = str(foon)
+            x1 = '(x[0] + (lamb * d[0]))'
+            x2 = '(x[1] + (lamb * d[1]))'
+            func1 = func1.replace('x1', x1)
+            func1 = func1.replace('x2', x2)
+            func1 = func1.replace('x[0]', str(x[0]))
+            func1 = func1.replace('x[1]', str(x[1]))
+            func1 = func1.replace('d[0]', str(d[0]))
+            func1 = func1.replace('d[1]', str(d[1]))
+            res = round(eval(func1), roun)
     return res
 
 def printRess(k, x, fx, j, d, y, lamb, y1):
@@ -181,67 +145,68 @@ def printRess(k, x, fx, j, d, y, lamb, y1):
 def countPoint(lamb, y, d):
     y1 = []
     for i in range(len(y)):
-        y1.append(round(y[i] + (lamb * (d[i])), 4))
+        y1.append(round(y[i] + (lamb * (d[i])), roun))
     return y1
 
+class iter_gaus:
+    def __init__(self, k, rng=100):
+        self.k = k
+        self.rng = rng
+
+    def newPoint(self, x):
+        j = 1
+        self.x = x
+        self.fx = getFoo(x=x, goal='f')
+        d = vectors[j-1]
+        self.lamb1 = getGoldenRatioRes(d, self.x, self.rng)
+        results['goldenRes'] = []
+        self.y = countPoint(self.lamb1[1], x, d)
+        self.fy = getFoo(x=self.y, goal='f') 
+        printRess(self.k, x, self.fx, j, d, x, self.lamb1[1], self.y)
+
+        j += 1
+        d = vectors[j-1]
+        self.lamb2 = getGoldenRatioRes(d, self.y, self.rng)
+        results['goldenRes'] = []
+        self.y1 = countPoint(self.lamb2[1], self.y, d)
+        self.fy1 = self.lamb2[1]
+        printRess(self.k, self.x, self.fx, j, d, self.y, self.lamb2[1], self.y1)
+
+        ang = math.sqrt((self.y1[0] - self.x[0])**2 + ((self.y1[1] - self.x[1])**2))
+        return ang
+
+def chooseFoo():
+    foos = [
+        '(x1**2 - x2**2 + x1 * x2 - x1 + 2 * x2)',
+        '((x1 - x2)**2 + (x2 - 2)**2)',
+        '(9 * (x1**2) + 16 * (x2**2) - 90 * x1 - 128 * x2)',
+        '((x1 - 2)**4 + (x1 - (2 * x2))**2)'
+    ]
+    print('Choose number of function:')
+    for i in range(len(foos)):
+        print(f'{i+1}. {foos[i]}')
+    return (foos[int(input('Enter number: ')) - 1])
+
+gaus_res = []
+rng = 100
+roun = 6
+vectors = [
+    [1, 0],
+    [0, 1]
+]
+k = 0
+ang = 10
+foon = chooseFoo()
+x1 = int(input('Enter x1: ')) # 0
+x2 = int(input('Enter x2: ')) # 3
+x = [x1, x2]
+eps = float(input('Enter eps: ')) # 0.01
 
 print(f'| k  |        xk       |  j  |    dj   |        yj       |  labmj  |       yj+1      |')
-rng = 5
-# Step 0
-x1 = 5
-x2 = -3
-x = [x1, x2]
-vectors = {
-    '0': [1, 0],
-    '1': [0, 1]
-}
-k = 1
-j = 0
-eps = 0.001
-# Step 1
-j += 1
-d = vectors[f'{j-1}']
-y1 = [x1, x2]
-
-fx = getFoo(x)
-lamb1 = getGoldenRatioRes([1, 0], x, rng)
-results['goldenRes'] = []
-y = countPoint(lamb1[1], x, [1, 0])
-fy = getFoo(x)
-printRess(k, x, fx, j, [1, 0], y1, lamb1[1], y)
-
-j += 1
-lamb2 = getGoldenRatioRes([0, 1], y, rng)
-results['goldenRes'] = []
-y1 = countPoint(lamb2[1], y, [0, 1])
-fy1 = getFoo(y1)
-printRess(k, x, fx, j, [0, 1], y1, lamb2[1], y)
-
-ang = math.sqrt((y1[0] - x[0])**2 + ((y1[1] - x[1])**2))
-# ang = abs(y1[0] - x[0]) + abs(y1[1] - x[1])
-
-j = 0
-
 while ang > eps:
-    x = y1
     k += 1
-    j += 1
-    d = [1, 0]
-    lamb1 = getGoldenRatioRes(d, x, rng)
-    results['goldenRes'] = []
-    y = countPoint(lamb1[1], x, d)
-    fl = getFoo(x) 
-    printRess(k, x, fl, j, d, y1, lamb1[1], y)
-
-    j += 1
-    d = [0, 1]
-    lamb2 = getGoldenRatioRes(d, y, rng)
-    results['goldenRes'] = []
-    y1 = countPoint(lamb2[1], y, d)
-    fl = lamb2[1]
-    printRess(k, x, fl, j, d, y, lamb2[1], y1)
-
-    ang = math.sqrt((y1[0] - x[0])**2 + ((y1[1] - x[1])**2))
-    print(getFoo([x1, x2]), '\n', getFoo(y), getFoo(y1))
-    print(ang)
-    j = 0
+    gaus_res.append(iter_gaus(k, rng))
+    if k != 1: 
+        ang = gaus_res[k-1].newPoint(gaus_res[k-2].y1)
+    else:
+        ang = gaus_res[k-1].newPoint(x)
