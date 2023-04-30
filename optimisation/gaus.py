@@ -3,17 +3,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 oper = '0'
-foo = '4'
+foo = '2'
 teta = ((math.sqrt(5) - 1) / 2)
 target = 0.1
-eps = 0.1
+# eps = 0.1
 results = {
     'goldenRes': []
 }
 
 def printRes (arr, method, fCalc, v, y1):
     arr = results['goldenRes']
-    obj = arr[0]
+    obj = arr[-1]
     match method:
         case 'gold':
             b1, a1 = obj.b, obj.a
@@ -30,7 +30,7 @@ def printRes (arr, method, fCalc, v, y1):
     print(f'x in bounds of{obj.a: >23.4f}:{obj.b:.4f}\nResult is: {(obj.a + obj.b) / 2: >26.4f}')
     print(f'Iterations calculated: {len(arr): >9}\nFoo Calculated: {fCalc: >16}')# \nIterations for target: {: >9}'.format(len(arr), math.floor(i2target)))
     print('Length by calculated values: {: >7.3f} \nLength by formula: {: >17.3f}'.format(obj.b-obj.a, target/(b1-a1)))
-    print(f'Function result: {getFooRes((obj.a + obj.b) / 2, foo, v, y1):^32.3f}')
+    print(f'Function result: {obj.FLamb:^32.3f}')
     print(f'{"":-^93}')
     print("| k  |      a      |      b      |    lambda    |     mu     |   F(lambda)   |     F(mu)    |")
     print(f'{"":-^93}')
@@ -41,18 +41,14 @@ def printRes (arr, method, fCalc, v, y1):
     # plt.axvline(x = obj.a, color = 'black')
     # plt.axvline(x = obj.b, color = 'black')
     # plt.axvline(x = z, color = 'red')
-    # # y = (obj.FLamb)
-    # y = round(getFooRes((obj.a + obj.b) / 2, foo, v, y1), 8)
+    # y = (obj.FLamb)
+    # # y = round(getFooRes((obj.a + obj.b) / 2, foo, v, y1), 8)
     # plt.plot(x, y, color='blue')
     # plt.show()
 
 def getFooRes (x, num, v, y1):
     match num:
         case '1':
-            x = (4 * ((x**2 - 2*x - 8) * (x**2 - 9)) / (x**2 - x**4 + 0.000001))
-        case '2':
-            x = (x**3 + 2*(x**2) - x + 2)
-        case '3':
             if oper == '0':
                 x2 = y1[1]
                 y = y1[0]
@@ -64,7 +60,7 @@ def getFooRes (x, num, v, y1):
                 # x2 = y
                 x = (((-x1)**2) - (((y + (x * v)))**2) + (x1 * (y + (x * v))) - x1 + ((y + (x * v)) * 2))
             # x = (y + (x * v))
-        case '4':
+        case '2':
             if oper == '0':
                 x2 = y1[1]
                 y = y1[0]
@@ -76,6 +72,23 @@ def getFooRes (x, num, v, y1):
                 # x2 = y
                 x = ((x1 - (y + (x * v)))**2 + ((y + (x * v)) - 2)**2)
     return x
+
+def evalFoo(lamb, foo, d, x):
+    lamb = lamb # later use in .replace magic method
+    foo = foo
+    # func = '(((-x1)**2) - (x2**2) + (x1 * x2) - x1 + (2 * x2))'
+    # func = '((x1 - x2)**2 + (x2 - 2)**2)'
+    func = '(9 * (x1**2) + 16 * (x2**2) - 90 * x1 - 128 * x2)'
+    x1 = '(x[0] + (lamb * d[0]))'
+    x2 = '(x[1] + (lamb * d[1]))'
+    func = func.replace('x1', x1)
+    func = func.replace('x2', x2)
+    func = func.replace('x[0]', str(x[0]))
+    func = func.replace('x[1]', str(x[1]))
+    func = func.replace('d[0]', str(d[0]))
+    func = func.replace('d[1]', str(d[1]))
+    # func = func.replace('lamb', str(lamb))
+    return round(eval(func), 4)
 
 class iter_info:
     def __init__(self, k):
@@ -97,23 +110,24 @@ class iter_info:
                         self.Lambda = (self.a + (1 - teta) * (self.b - self.a))
                         # print('count lamb')
             
-        self.FLamb = getFooRes(self.Lambda, foo, v, y1)
-        self.FMu = getFooRes(self.Mu, foo, v, y1)
+        self.FLamb = evalFoo(self.Lambda, foo, v, y1)
+        self.FMu = evalFoo(self.Mu, foo, v, y1)
         
         
         # self.FLamb = getFooRes(self.Lambda, foo)
         # self.FMu = getFooRes(self.Mu, foo)
 
-def getGoldenRatioRes (a, b, vect, y1):
+def getGoldenRatioRes (vect, y1, rng):
     k, fCalc = 0, 0
     goldFlag = 0
     method = 'gold'
     res = results['goldenRes']
     res.append(iter_info(k))
     arr = res[k]
-    arr.a, arr.b = a, b
+    arr.a, arr.b = -rng, rng
     fCalc += 2
-    while b - a > target:
+    arr.calc(method, vect, y1, goldFlag)
+    while arr.b - arr.a > eps:
         res.append(iter_info(k + 1))
         arr1 = res[k + 1]
         arr.calc(method, vect, y1, goldFlag)
@@ -123,12 +137,6 @@ def getGoldenRatioRes (a, b, vect, y1):
                 foper = arr.FLamb
                 soper = arr.FMu
             case '2':
-                foper = arr.FMu
-                soper = arr.FLamb
-            case '3':
-                foper = arr.FLamb
-                soper = arr.FMu
-            case '4':
                 foper = arr.FLamb
                 soper = arr.FMu
         if foper > soper:
@@ -136,12 +144,14 @@ def getGoldenRatioRes (a, b, vect, y1):
             fCalc += 1
             arr1.a, arr1.b = arr.Lambda, arr.b
             arr1.Lambda = arr.Mu
+            arr1.Mu = (arr1.a + teta * (arr1.b - arr1.a))
             arr1.calc(method, vect, y1, goldFlag)
         else:
             goldFlag = 2
             fCalc += 1
             arr1.a, arr1.b = arr.a, arr.Mu
             arr1.Mu = arr.Lambda
+            arr1.Lambda = (arr1.a + (1 - teta) * (arr1.b - arr1.a))
             arr1.calc(method, vect, y1, goldFlag)
         goldFlag = 0
         k += 1
@@ -149,23 +159,18 @@ def getGoldenRatioRes (a, b, vect, y1):
         a, b = arr.a, arr.b
     arr.calc(method, vect, y1, goldFlag)
     # printRes(res, method, fCalc, vect, y1)
-    results['goldenRes'] = []
-    return [arr.Lambda, arr.FLamb]
+    
+    return [round((abs(arr.a - arr.b)) / 2, 4), arr.Lambda]
 
-x1 = 1.0
-x2 = 0.0
-x = [x1, x2]
-xs = x
-vectors = {
-    '0': [1.0, 0.0],
-    '1': [0.0, 1.0]
-}
-y = x
-k = 0
-j = 0
+def getFoo(x):
+    x1 = x[0]
+    x2 = x[1]
+    # res = (((-x1)**2) - (x2**2) + (x1 * x2) - x1 + (2 * x2))
+    # res = ((x1 - x2)**2 + (x2 - 2)**2)
+    res = (9 * (x1**2) + 16 * (x2**2) - 90 * x1 - 128 * x2)
+    return res
 
 def printRess(k, x, fx, j, d, y, lamb, y1):
-    # print(f'| k  |        xk       |  j  |    dj   |        yj       |  labmj  |       yj+1      |')
     print(f'{"":-^86}')
     if j == 1:
         print(f'|{k:^4}| {x[0]: >7.4f}:{x[1]: >7.4f} | {j: >3.1f} | {d[0]: >3.1f}:{d[1]:.1f} | {y[0]: >7.4f}:{y[1]: >7.4f} | {lamb: >7.4f} | {y1[0]: >7.4f}:{y1[1]: >7.4f} |')
@@ -173,40 +178,70 @@ def printRess(k, x, fx, j, d, y, lamb, y1):
         print(f'|{k:^4}| {fx: >15.4f} | {j: >3.1f} | {d[0]: >3.1f}:{d[1]:.1f} | {y[0]: >7.4f}:{y[1]: >7.4f} | {lamb: >7.4f} | {y1[0]: >7.4f}:{y1[1]: >7.4f} |')
     # print(f'{"":-^86}')
 
-ang = 10
+def countPoint(lamb, y, d):
+    y1 = []
+    for i in range(len(y)):
+        y1.append(round(y[i] + (lamb * (d[i])), 4))
+    return y1
+
+
 print(f'| k  |        xk       |  j  |    dj   |        yj       |  labmj  |       yj+1      |')
 rng = 5
+# Step 0
+x1 = 5
+x2 = -3
+x = [x1, x2]
+vectors = {
+    '0': [1, 0],
+    '1': [0, 1]
+}
+k = 1
+j = 0
+eps = 0.001
+# Step 1
+j += 1
+d = vectors[f'{j-1}']
+y1 = [x1, x2]
+
+fx = getFoo(x)
+lamb1 = getGoldenRatioRes([1, 0], x, rng)
+results['goldenRes'] = []
+y = countPoint(lamb1[1], x, [1, 0])
+fy = getFoo(x)
+printRess(k, x, fx, j, [1, 0], y1, lamb1[1], y)
+
+j += 1
+lamb2 = getGoldenRatioRes([0, 1], y, rng)
+results['goldenRes'] = []
+y1 = countPoint(lamb2[1], y, [0, 1])
+fy1 = getFoo(y1)
+printRess(k, x, fx, j, [0, 1], y1, lamb2[1], y)
+
+ang = math.sqrt((y1[0] - x[0])**2 + ((y1[1] - x[1])**2))
+# ang = abs(y1[0] - x[0]) + abs(y1[1] - x[1])
+
+j = 0
+
 while ang > eps:
+    x = y1
     k += 1
     j += 1
-    vec = vectors[f'{j-1}']
-    lamb = getGoldenRatioRes(x[j-1] - rng, x[j-1] + rng, 1.0, y)
-    y[0] += lamb[0]
-    fl = lamb[1]
-    x = y
-    d = vectors[f'{j - 1}']
-    printRess(k, [x1, x2], fl, j, d, y, lamb[0], x)
-    # print(f'x = {lamb[0], lamb[1]}')
+    d = [1, 0]
+    lamb1 = getGoldenRatioRes(d, x, rng)
+    results['goldenRes'] = []
+    y = countPoint(lamb1[1], x, d)
+    fl = getFoo(x) 
+    printRess(k, x, fl, j, d, y1, lamb1[1], y)
 
     j += 1
-    lamb = getGoldenRatioRes(x[j-1] - rng, x[j-1] + rng, 1.0, y)
-    y[1] += lamb[0]
-    fl = lamb[1]
-    ang = abs(x1 - y[0]) + abs(x2 - y[1])
-    x = y
-    d = vectors[f'{j - 1}']
-    printRess(k, [x1, x2], fl, j, d, y, lamb[0], x)
-    # print(f'y = {lamb[0], lamb[1]}')
+    d = [0, 1]
+    lamb2 = getGoldenRatioRes(d, y, rng)
+    results['goldenRes'] = []
+    y1 = countPoint(lamb2[1], y, d)
+    fl = lamb2[1]
+    printRess(k, x, fl, j, d, y, lamb2[1], y1)
 
-    # print(ang)
-    x1, x2 = y[0], y[1]
+    ang = math.sqrt((y1[0] - x[0])**2 + ((y1[1] - x[1])**2))
+    print(getFoo([x1, x2]), '\n', getFoo(y), getFoo(y1))
+    print(ang)
     j = 0
-
-# lamb = getGoldenRatioRes(x[0] - 2, x[0] + 2, 1.0, y)
-# y[0] += lamb
-# x = y
-# lamb = getGoldenRatioRes(x[0] - 2, x[0] + 2, 1.0, y)
-# y[1] += lamb
-# ang = abs(x1 - y[0]) + abs(x2 - y[1])
-# x = y
-# print(ang)
