@@ -1,4 +1,5 @@
 import math
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -35,6 +36,7 @@ def printRes (arr, method, fCalc, v, y1):
     print(f'{"":-^93}')
     for i in range(len(arr)):
         arr[i].getInfo()
+
     # z = ((obj.a + obj.b) / 2)
     # x = np.arange(obj.a, obj.b, eps)
     # plt.axvline(x = obj.a, color = 'black')
@@ -105,8 +107,6 @@ def getGoldenRatioRes (vect, y1, rng):
         goldFlag = 0
         k += 1
         arr = res[k]
-        if arr.a > arr.b:
-            arr.a, arr.b = arr.b, arr.a
     # arr.calc(method, vect, y1, goldFlag)
     # printRes(res, method, fCalc, vect, y1)
     
@@ -135,12 +135,15 @@ def getFoo(lamb=0, d=[0,0], x=[0,0], goal='f'):
     return res
 
 def printRess(k, x, fx, j, d, y, lamb, y1):
-    print(f'{"":-^86}')
+    if k == 1 and j == 1:
+        print(f'{"":-^86}')
+        print(f'| k  |        xk       |  j  |    dj   |        yj       |  labmj  |       yj+1      |')
+        print(f'{"":-^86}')
     if j == 1:
-        print(f'|{k:^4}| {x[0]: >7.4f}:{x[1]: >7.4f} | {j: >3.1f} | {d[0]: >3.1f}:{d[1]:.1f} | {y[0]: >7.4f}:{y[1]: >7.4f} | {lamb: >7.4f} | {y1[0]: >7.4f}:{y1[1]: >7.4f} |')
+        print(f'|{k:^4}| {x[0]: >7.4f}:{x[1]: >7.4f} | {j: >3.1f} | {d[0]: >3.1f}:{d[1]:.1f} | {x[0]: >7.4f}:{x[1]: >7.4f} | {lamb: >7.4f} | {y1[0]: >7.4f}:{y1[1]: >7.4f} |')
     elif j == 2:
         print(f'|{k:^4}| {fx: >15.4f} | {j: >3.1f} | {d[0]: >3.1f}:{d[1]:.1f} | {y[0]: >7.4f}:{y[1]: >7.4f} | {lamb: >7.4f} | {y1[0]: >7.4f}:{y1[1]: >7.4f} |')
-    # print(f'{"":-^86}')
+    print(f'{"":-^86}')
 
 def countPoint(lamb, y, d):
     y1 = []
@@ -202,7 +205,6 @@ x2 = int(input('Enter x2: ')) # 3
 x = [x1, x2]
 eps = float(input('Enter eps: ')) # 0.01
 
-print(f'| k  |        xk       |  j  |    dj   |        yj       |  labmj  |       yj+1      |')
 while ang > eps:
     k += 1
     gaus_res.append(iter_gaus(k, rng))
