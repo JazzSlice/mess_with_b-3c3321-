@@ -210,14 +210,12 @@ def getPoints(ar):
     x_val.append(x1)
     y_val.append(x2)
     for i in range(len(ar)):
-        x_val.append(ar[i-1].y[0])
-        x_val.append(ar[i-1].y1[0])
-        y_val.append(ar[i-1].y[1])
-        y_val.append(ar[i-1].y1[1])
-    del x_val[1:3]
-    del y_val[1:3]
-    # x_val[1], x_val[2] = x_val[3], x_val[3]
-    # y_val[1], y_val[2] = y_val[3], y_val[3]
+        x_val.append(ar[i].y[0])
+        x_val.append(ar[i].y1[0])
+        y_val.append(ar[i].y[1])
+        y_val.append(ar[i].y1[1])
+    # del x_val[1:3]
+    # del y_val[1:3]
 
     return x_val, y_val
 
