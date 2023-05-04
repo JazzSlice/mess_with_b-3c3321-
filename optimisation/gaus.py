@@ -2,6 +2,7 @@ import math
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 oper = '0'
 foo = '2'
@@ -188,10 +189,54 @@ def chooseFoo():
     print('Choose number of function:')
     for i in range(len(foos)):
         print(f'{i+1}. {foos[i]}')
-    return (foos[int(input('Enter number: ')) - 1])
+    choise = int(input('Enter number: ')) 
+    return [foos[choise - 1], choise]
+
+def countByChoise(x1, x2, choise):
+    match choise:
+        case 1:
+            res = (x1**2 - x2**2 + x1 * x2 - x1 + 2 * x2)
+        case 2:
+            res = ((x1 - x2)**2 + (x2 - 2)**2)
+        case 3:
+            res = (9 * (x1**2) + 16 * (x2**2) - 90 * x1 - 128 * x2)
+        case 4:
+            res = ((x1 - 2)**4 + (x1 - (2 * x2))**2)
+    return res
+
+def getPoints(ar):
+    x_val = []
+    y_val = []
+    x_val.append(ar[0].x[0])
+    y_val.append(ar[0].x[1])
+    for i in range(len(ar)):
+        x_val.append(ar[i-1].y1[0])
+        y_val.append(ar[i-1].y1[1])
+
+    return x_val, y_val
+
+def buildPlot(arr):
+    rng = 2
+    px = arr[-1].y1[0]
+    py = arr[-1].y1[1]
+
+    X_AX = np.arange(px - rng, px + rng, 0.1)
+    Y_AX = np.arange(py - rng, py + rng, 0.1)
+    X, Y = np.meshgrid(X_AX, Y_AX)
+    counted_points = getPoints(arr)
+    plt.plot(counted_points[0], counted_points[1], 'bo', linestyle='--')
+    plt.plot(px, py, marker='o', markersize=12, markeredgecolor='red', markerfacecolor='yellow')
+
+    C = plt.contour(X, Y, countByChoise(X, Y, choise), 8, colors='black')
+    plt.contourf(X, Y, countByChoise(X, Y, choise), 8)
+    plt.clabel(C, inline=1, fontsize=10)
+    plt.colorbar()
+
+    plt.show()
+
 
 gaus_res = []
-rng = 100
+rng = 10
 roun = 6
 vectors = [
     [1, 0],
@@ -199,7 +244,7 @@ vectors = [
 ]
 k = 0
 ang = 10
-foon = chooseFoo()
+foon, choise = chooseFoo()
 x1 = int(input('Enter x1: ')) # 0
 x2 = int(input('Enter x2: ')) # 3
 x = [x1, x2]
@@ -212,3 +257,5 @@ while ang > eps:
         ang = gaus_res[k-1].newPoint(gaus_res[k-2].y1)
     else:
         ang = gaus_res[k-1].newPoint(x)
+
+buildPlot(gaus_res)
