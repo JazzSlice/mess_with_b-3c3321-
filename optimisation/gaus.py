@@ -207,15 +207,21 @@ def countByChoise(x1, x2, choise):
 def getPoints(ar):
     x_val = []
     y_val = []
-    x_val.append(ar[0].x[0])
-    y_val.append(ar[0].x[1])
+    x_val.append(x1)
+    y_val.append(x2)
     for i in range(len(ar)):
+        x_val.append(ar[i-1].y[0])
         x_val.append(ar[i-1].y1[0])
+        y_val.append(ar[i-1].y[1])
         y_val.append(ar[i-1].y1[1])
+    del x_val[1:3]
+    del y_val[1:3]
+    # x_val[1], x_val[2] = x_val[3], x_val[3]
+    # y_val[1], y_val[2] = y_val[3], y_val[3]
 
     return x_val, y_val
 
-def buildPlot(arr):
+def buildPlot(arr, rng):
     rng = 2
     px = arr[-1].y1[0]
     py = arr[-1].y1[1]
@@ -258,4 +264,4 @@ while ang > eps:
     else:
         ang = gaus_res[k-1].newPoint(x)
 
-buildPlot(gaus_res)
+buildPlot(gaus_res, rng)
