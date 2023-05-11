@@ -162,7 +162,7 @@ class iter_gaus:
         results['goldenRes'] = []
         self.y = countPoint(self.lamb1[1], x, d)
         self.fy = getFoo(x=self.y, goal='f') 
-        printRess(self.k, x, self.fx, j, d, x, self.lamb1[1], self.y)
+        # printRess(self.k, x, self.fx, j, d, x, self.lamb1[1], self.y)
 
         j += 1
         d = vectors[j-1]
@@ -170,7 +170,7 @@ class iter_gaus:
         results['goldenRes'] = []
         self.y1 = countPoint(self.lamb2[1], self.y, d)
         self.fy1 = self.lamb2[1]
-        printRess(self.k, self.x, self.fx, j, d, self.y, self.lamb2[1], self.y1)
+        # printRess(self.k, self.x, self.fx, j, d, self.y, self.lamb2[1], self.y1)
 
         ang = math.sqrt((self.y1[0] - self.x[0])**2 + ((self.y1[1] - self.x[1])**2))
         return ang
@@ -266,7 +266,6 @@ while True:
             if penalty[i] <= 0:
                 penalty[i] = 0
         penalty = (penalty[0]**2 + penalty[1]**2) * mu
-        print(f'mu: {mu}')
         mu = 10
 
     else:
@@ -285,8 +284,11 @@ while True:
         ang = gaus_res[k-1].newPoint(x)
     gaus_res[k-1].penalty = penalty
 
-    print(f'xk+1: {gaus_res[k-1].y1}\nf(xk): {gaus_res[k-1].fy1}')
-    print(f'alfa: {penalty / mu}\nomega: {gaus_res[k-1].fy1 - penalty / mu}\nmu_alfa: {penalty}')
+    if k == 1:
+        print('| k   |   mu   |           xk+1          |   f(xk)   |    alfa   |    omega   |  mu_alfa   |')
+        print(f'{"":-^92}')
+    print(f'|{k:^4} | {round(mu, roun): >6} | {gaus_res[k-1].y1[0]: >11}:{gaus_res[k-1].y1[1]: >11} | {round(gaus_res[k-1].fy1, roun): >9} | {round(penalty / mu, roun): >9} | {round(gaus_res[k-1].fy1 - penalty / mu, roun): > 10} | {round(penalty, roun): >11}|')
+    print(f'{"":-^92}')
 
     penalty = []
     g = gaus_res[k-1].y1
@@ -297,7 +299,6 @@ while True:
             penalty[i] = 0
     penalty = (penalty[0]**2 + penalty[1]**2) * mu
 
-    print(countByChoise(gaus_res[k-1].y1[0], gaus_res[k-1].y1[1], choise), eps, penalty)
     if penalty < eps:
         break 
     else: 
