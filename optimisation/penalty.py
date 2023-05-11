@@ -55,13 +55,10 @@ class iter_info:
                         self.Mu = (self.a + teta * (self.b - self.a))
                     case 2:
                         self.Lambda = (self.a + (1 - teta) * (self.b - self.a))
-        match foo:
-            case '2':
+
                 self.FLamb = getFoo(self.Lambda, v, y1, 'e')
                 self.FMu = getFoo(self.Mu, v, y1, 'e')
-            case '1':
-                self.FLamb = getFoo(self.Lambda, v, y1, 'p')
-                self.FMu = getFoo(self.Mu, v, y1, 'p')
+
 
 def getGoldenRatioRes (vect, y1, rng):
     k, fCalc = 0, 0
@@ -113,7 +110,7 @@ def getFoo(lamb=0, d=[0,0], x=[0,0], goal='f'):
             func = foon
             func = func.replace('x1', str(x[0]))
             func = func.replace('x2', str(x[1]))
-            func = func.replace('a(x)', str(0))
+            func = func.replace('a(x)', str(penalty))
             res = round(eval(func), roun)
         case 'e':
             func1 = str(foon)
@@ -125,7 +122,7 @@ def getFoo(lamb=0, d=[0,0], x=[0,0], goal='f'):
             func1 = func1.replace('x[1]', str(x[1]))
             func1 = func1.replace('d[0]', str(d[0]))
             func1 = func1.replace('d[1]', str(d[1]))
-            func1 = func1.replace('a(x)', str(mu * penalty[1]))
+            func1 = func1.replace('a(x)', str(penalty))
             res = round(eval(func1), roun)
         case 'p':
             ar = []
@@ -203,7 +200,7 @@ def countByChoise(x1, x2, choise):
         case 4:
             res = ((x1 - 2)**4 + (x1 - (2 * x2))**2)
         case 5:
-            res = (x1**2 + x2**2)
+            res = ((x1**2 + x2**2) + penalty)
     return res
 
 def getPoints(ar):
@@ -220,7 +217,7 @@ def getPoints(ar):
     return x_val, y_val
 
 def buildPlot(arr, rng):
-    rng = 1
+    rng = 6
     px = arr[-1].y1[0]
     py = arr[-1].y1[1]
 
@@ -254,33 +251,54 @@ x2 = int(input('Enter x2: ')) # 3
 x = [x1, x2]
 eps = float(input('Enter eps: ')) # 0.01
 
-mu = 10000 
-beta = 5 
+mu = 1
+beta = 0.1
 
 while True:
     k += 1
     gaus_res.append(iter_gaus(k, rng))
-    foo = '1'
+    
     if k == 1: 
-        penalty = getGoldenRatioRes([1,1], x, rng)
-    else:
-        penalty = getGoldenRatioRes([1,1], gaus_res[k-1].y1, rng)
+        penalty = []
+        penalty.append(2 * x[0] + x[1] - 2)
+        penalty.append(-x[1] + 1)
+        for i in range(len(penalty)):
+            if penalty[i] <= 0:
+                penalty[i] = 0
+        penalty = (penalty[0]**2 + penalty[1]**2) * mu
+        print(f'mu: {mu}')
+        mu = 10
 
-    foo = '2'
-    results['goldenRes'] = [] 
+    else:
+        penalty = []
+        g = gaus_res[k-2].y1
+        penalty.append(2 * g[0] + g[1] - 2)
+        penalty.append(-g[1] + 1)
+        for i in range(len(penalty)):
+            if penalty[i] <= 0:
+                penalty[i] = 0
+        penalty = (penalty[0]**2 + penalty[1]**2) * mu
+
     if k != 1: 
         ang = gaus_res[k-1].newPoint(gaus_res[k-2].y1)
     else:
         ang = gaus_res[k-1].newPoint(x)
+    gaus_res[k-1].penalty = penalty
 
-    foo = '1'
-    penalty = getGoldenRatioRes([1,1], gaus_res[k-1].y1, rng)
+    print(f'xk+1: {gaus_res[k-1].y1}\nf(xk): {gaus_res[k-1].fy1}')
+    print(f'alfa: {penalty / mu}\nomega: {gaus_res[k-1].fy1 - penalty / mu}\nmu_alfa: {penalty}')
 
-    foo = '2'
-    results['goldenRes'] = [] 
+    penalty = []
+    g = gaus_res[k-1].y1
+    penalty.append(2 * g[0] + g[1] - 2)
+    penalty.append(-g[1] + 1)
+    for i in range(len(penalty)):
+        if penalty[i] <= 0:
+            penalty[i] = 0
+    penalty = (penalty[0]**2 + penalty[1]**2) * mu
 
-    print(countByChoise(gaus_res[k-1].y1[0], gaus_res[k-1].y1[1], choise), eps, penalty[1])
-    if penalty[1] < eps:
+    print(countByChoise(gaus_res[k-1].y1[0], gaus_res[k-1].y1[1], choise), eps, penalty)
+    if penalty < eps:
         break 
     else: 
         mu = mu * beta
