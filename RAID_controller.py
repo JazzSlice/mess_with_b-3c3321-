@@ -46,6 +46,7 @@ while True:
     txt = input('1. Add data kit\n2. Show logic-disk status\n3. Remove layer\n4. Break\n')
     match txt:
         case '1':
+            ex_flag = 0
             data_kit_v = 80 #int(input(Enter data-kit volume: ))
             data_vpd = data_kit_v / (disk_num - 2)
             
@@ -56,6 +57,7 @@ while True:
                 print('Overweight data_kit')
                 break
             
+            
             if index -1 == 0:
                 op1 = index -1
                 op2 = disk_num -1
@@ -64,47 +66,64 @@ while True:
                 op1 = index - 1
                 op2 = index - 2
 
-            for j in range(disk_num):
-                if j == op1 or j == op2:
-                    logical_disk[f'{j}'].add_layer(0.01)
+            for i in range(disk_num):
+                if i == op1 or i == op2:
+                    a = logical_disk[f'{i}'].memory - (logical_disk[f'{i}'].count_busy_memory() + 0.01)
                 else:
-                    logical_disk[f'{j}'].add_layer(data_vpd)
+                    a = logical_disk[f'{i}'].memory - (logical_disk[f'{i}'].count_busy_memory() + data_vpd)
+                if a < 0:
+                    print(f'Data kit is too large! No space on {i+1} disk: {logical_disk[f"{i}"].count_busy_memory():.2f} / {logical_disk[f"{i}"].memory:.2f}')
+                    ex_flag = 1
+            
+            if ex_flag:
+                print('Data kis was not loaded.')
+            else:
+                for j in range(disk_num):
+                    if j == op1 or j == op2:
+                        logical_disk[f'{j}'].add_layer(0.01)
+                    else:
+                        logical_disk[f'{j}'].add_layer(data_vpd)
 
             index -= 1
 
             if rebase_flag:
                 index = disk_num
                 rebase_flag = 0
-                
-            i += 1
+
         case '2':
             check_len = []
             line = '\n| Layer |'
             for j in range(disk_num):
                 line += f'      Disk {j+1}      |'
             line += f'\n{"":-^104}\n|       |'
+
             for j in range(disk_num):
                 line += f'   Data  | Secret |'
                 check_len.append(len(logical_disk[f'{j}'].layers))
             line += f'\n{"":-^104}\n'
+
             for j in range(min(check_len)):
                 line += f'|{j+1:^7}| '
                 for g in range(len(logical_disk)):
                     mem = logical_disk[f'{g}'].layers[j]
                     line += f'{mem // 1: >7.2f} | {mem % 1: >6.2f} | '
                 line += '\n'
+
             util = 0
             line += f'{"":-^104}\n|       |'
+
             for i in range(len(logical_disk)):
                 util += logical_disk[f'{i}'].count_busy_memory()
                 line += f" {logical_disk[f'{i}'].count_busy_memory(): >7.2f} / {logical_disk[f'{i}'].memory :.2f} |"
 
             line += f'\nUtilisation: {round((disk_v * disk_num - util) / (disk_v * disk_num), 2)}\n'
             print(line)
+
         case '3':
-            layer = int(input('Which layer do you want delete?\n'))
+            layer = int(input('Which layer do you want delete? '))
             for j in range(len(logical_disk)):
                 disk_pointer = logical_disk[f'{j}']
                 disk_pointer.removeLayer(layer)
+
         case '4':
             break
