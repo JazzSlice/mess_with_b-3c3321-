@@ -2,7 +2,8 @@ import math
 import time
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d.axes3d import Axes3D
+from mpl_toolkits.mplot3d import axes3d
+from matplotlib import cm
 
 oper = '0'
 foo = '2'
@@ -110,19 +111,26 @@ def getFoo(lamb=0, d=[0,0], x=[0,0], goal='f'):
             func = foon
             func = func.replace('x1', str(x[0]))
             func = func.replace('x2', str(x[1]))
-            func = func.replace('a(x)', str(penalty))
+            a = max((2 * x[0] + x[1] - 2), 0)
+            b = max((-x[1] + 1), 0)
+            func = func.replace('a(x)', str(mu * (a**2 + b**2)))
+            # print(f'func = {func}')
             res = round(eval(func), roun)
         case 'e':
             func1 = str(foon)
             x1 = '(x[0] + (lamb * d[0]))'
             x2 = '(x[1] + (lamb * d[1]))'
-            func1 = func1.replace('x1', x1)
+            func1 = func1.replace('x1', x1) 
             func1 = func1.replace('x2', x2)
             func1 = func1.replace('x[0]', str(x[0]))
             func1 = func1.replace('x[1]', str(x[1]))
             func1 = func1.replace('d[0]', str(d[0]))
             func1 = func1.replace('d[1]', str(d[1]))
-            func1 = func1.replace('a(x)', str(penalty))
+            func1 = func1.replace('lamb', str(lamb))
+            a = max((2 * x[0] + x[1] - 2), 0)
+            b = max((-x[1] + 1), 0)
+            func1 = func1.replace('a(x)', str(mu * (a**2 + b**2)))
+            # print(f'func1 = {func1}, ab = {a, b}')
             res = round(eval(func1), roun)
         case 'p':
             ar = []
@@ -200,7 +208,7 @@ def countByChoise(x1, x2, choise):
         case 4:
             res = ((x1 - 2)**4 + (x1 - (2 * x2))**2)
         case 5:
-            res = ((x1**2 + x2**2) + penalty)
+            res = ((x1**2 + x2**2)) + penal# + mu * (max((2 * x1 + x2 - 2)**2, 0) + max((-x2 + 1)**2), 0))
     return res
 
 def getPoints(ar):
@@ -217,13 +225,23 @@ def getPoints(ar):
     return x_val, y_val
 
 def buildPlot(arr, rng):
-    rng = 6
+    rng = 10
     px = arr[-1].y1[0]
     py = arr[-1].y1[1]
 
-    X_AX = np.arange(px - rng, px + rng, 0.1)
-    Y_AX = np.arange(py - rng, py + rng, 0.1)
+    X_AX = np.arange(px - rng, px + rng + 0.1, 0.1)
+    Y_AX = np.arange(py - rng, py + rng + 0.1, 0.1)
     X, Y = np.meshgrid(X_AX, Y_AX)
+    # Z = (X**2 + Y**2) + mu * ((2 * X + Y - 2)**2 + ((-Y + 1)**2))
+    # R = (2 * X + Y - 2)
+    # C = (-Y + 1)
+
+    # fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+    # ax.plot_surface(X, Y, Z, vmin=Z.min() * 2, cmap=cm.Blues)
+
+    # ax.set(xticklabels=[],
+    #     yticklabels=[],
+    #     zticklabels=[])
     counted_points = getPoints(arr)
     plt.plot(counted_points[0], counted_points[1], 'bo', linestyle='--')
     plt.plot(px, py, marker='o', markersize=12, markeredgecolor='red', markerfacecolor='yellow')
@@ -235,9 +253,18 @@ def buildPlot(arr, rng):
 
     plt.show()
 
+# def countPenalty(x, mu):
+    # penalty = [] ((2 * x[0] + x[1] - 2)**2 + (-x[1] + 1)**2)
+    # penalty.append(2 * x[0] + x[1] - 2)
+    # penalty.append(-x[1] + 1)
+    # for i in range(len(penalty)):
+    #     if penalty[i] <= 0:
+    #         penalty[i] = 0
+    # penalty = (penalty[0]**2 + penalty[1]**2) * mu
+    # return penalty
 
 gaus_res = []
-rng = 10
+rng = 1
 roun = 6
 vectors = [
     [1, 0],
@@ -251,57 +278,38 @@ x2 = int(input('Enter x2: ')) # 3
 x = [x1, x2]
 eps = float(input('Enter eps: ')) # 0.01
 
-mu = 1
-beta = 0.1
+mu = 100
+beta = 10
 
 while True:
     k += 1
     gaus_res.append(iter_gaus(k, rng))
     
-    if k == 1: 
-        penalty = []
-        penalty.append(2 * x[0] + x[1] - 2)
-        penalty.append(-x[1] + 1)
-        for i in range(len(penalty)):
-            if penalty[i] <= 0:
-                penalty[i] = 0
-        penalty = (penalty[0]**2 + penalty[1]**2) * mu
-        mu = 10
-
-    else:
-        penalty = []
-        g = gaus_res[k-2].y1
-        penalty.append(2 * g[0] + g[1] - 2)
-        penalty.append(-g[1] + 1)
-        for i in range(len(penalty)):
-            if penalty[i] <= 0:
-                penalty[i] = 0
-        penalty = (penalty[0]**2 + penalty[1]**2) * mu
 
     if k != 1: 
-        ang = gaus_res[k-1].newPoint(gaus_res[k-2].y1)
+        ang = gaus_res[-1].newPoint(gaus_res[-2].y1)
+        penal = (max((2 * gaus_res[-1].y1[0] + gaus_res[-1].y1[1] - 2), 0)**2 + max((0 - gaus_res[k-2].y1[1] + 1), 0)**2) * mu
     else:
-        ang = gaus_res[k-1].newPoint(x)
-    gaus_res[k-1].penalty = penalty
+        ang = gaus_res[-1].newPoint(x)
+        penal = (max((2 * x[0] + x[1] - 2), 0)**2 + max((0 -x[1] + 1), 0)**2) * mu
+    fres = gaus_res[-1].y1[0]**2 + gaus_res[-1].y1[1]**2
+    
 
     if k == 1:
         print('| k   |   mu   |           xk+1          |   f(xk)   |    alfa   |    omega   |  mu_alfa   |')
         print(f'{"":-^92}')
-    print(f'|{k:^4} | {round(mu, roun): >6} | {gaus_res[k-1].y1[0]: >11}:{gaus_res[k-1].y1[1]: >11} | {round(gaus_res[k-1].fy1, roun): >9} | {round(penalty / mu, roun): >9} | {round(gaus_res[k-1].fy1 - penalty / mu, roun): > 10} | {round(penalty, roun): >11}|')
+    print(f'|{k:^4} | {round(mu, roun): >6} | {gaus_res[-1].y1[0]: >11}:{gaus_res[-1].y1[1]: >11} | {round(fres, roun): >9} | {round(penal / mu, roun): >9} | {round(fres + round(penal, roun)): > 10} | {round(penal, roun): >11}|')
     print(f'{"":-^92}')
 
-    penalty = []
-    g = gaus_res[k-1].y1
-    penalty.append(2 * g[0] + g[1] - 2)
-    penalty.append(-g[1] + 1)
-    for i in range(len(penalty)):
-        if penalty[i] <= 0:
-            penalty[i] = 0
-    penalty = (penalty[0]**2 + penalty[1]**2) * mu
+    penal = (max((2 * gaus_res[-1].y1[0] + gaus_res[-1].y1[1] - 2), 0)**2 + max((-gaus_res[-1].y1[1] + 1), 0)**2) * mu
 
-    if penalty < eps:
+    if penal < eps:
         break 
     else: 
+        if k == 1:
+            mu = 1
         mu = mu * beta
+
+print(gaus_res[-1].y1, round(fres, roun), penal)
 
 buildPlot(gaus_res, rng)
