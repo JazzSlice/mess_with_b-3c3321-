@@ -5,150 +5,71 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
 from matplotlib import cm
 
-oper = '0'
-foo = '2'
 teta = ((math.sqrt(5) - 1) / 2)
 target = 0.1
 results = {
     'goldenRes': []
 }
 
-def printRes (arr, method, fCalc, v, y1):
-    arr = results['goldenRes']
-    obj = arr[-1]
-    match method:
-        case 'gold':
-            b1, a1 = obj.b, obj.a
-            txt = 'GOLDEN_RATIO_RESULT'
-            i2target = (np.log((b1 - a1) / target) / np.log(teta))# could use //
-            print(f"{txt:_^93}")
-
-    if obj.a > obj.b:
-        n = obj.a
-        obj.a = obj.b
-        obj.b = n
-
-    print(f'a = {a1} | b = {b1} | l = {target} | eps = {eps}')
-    print(f'x in bounds of{obj.a: >23.4f}:{obj.b:.4f}\nResult is: {(obj.a + obj.b) / 2: >26.4f}')
-    print(f'Iterations calculated: {len(arr): >9}\nFoo Calculated: {fCalc: >16}')# \nIterations for target: {: >9}'.format(len(arr), math.floor(i2target)))
-    print('Length by calculated values: {: >7.3f} \nLength by formula: {: >17.3f}'.format(obj.b-obj.a, target/(b1-a1)))
-    print(f'Function result: {obj.FLamb:^32.3f}')
-    print(f'{"":-^93}')
-    print("| k  |      a      |      b      |    lambda    |     mu     |   F(lambda)   |     F(mu)    |")
-    print(f'{"":-^93}')
-    for i in range(len(arr)):
-        arr[i].getInfo()
-
-
 class iter_info:
     def __init__(self, k):
         self.k = k + 1
     def getInfo(self):
         print(f'|{self.k:^4}|{self.a: >13.4f}|{self.b: >13.4f}|{self.Lambda: >14.4f}|{self.Mu: >12.4f}|{self.FLamb: >15.4f}|{self.FMu: >14.4f}|')
-    def calc(self, method, v, y1, goldFlag):
-        match method:
-            case 'gold':
-                match goldFlag:
-                    case 0:
-                        self.Lambda = (self.a + (1 - teta) * (self.b - self.a))
-                        self.Mu = (self.a + teta * (self.b - self.a))
-                    case 1:
-                        self.Mu = (self.a + teta * (self.b - self.a))
-                    case 2:
-                        self.Lambda = (self.a + (1 - teta) * (self.b - self.a))
+    def calc(self, v, y1, goldFlag):
+            match goldFlag:
+                case 0:
+                    self.Lambda = (self.a + (1 - teta) * (self.b - self.a))
+                    self.Mu = (self.a + teta * (self.b - self.a))
+                case 1:
+                    self.Mu = (self.a + teta * (self.b - self.a))
+                case 2:
+                    self.Lambda = (self.a + (1 - teta) * (self.b - self.a))
 
-                self.FLamb = getFoo(self.Lambda, v, y1, 'e')
-                self.FMu = getFoo(self.Mu, v, y1, 'e')
+            self.FLamb = getFoo(self.Lambda, v, y1)
+            self.FMu = getFoo(self.Mu, v, y1)
 
 
 def getGoldenRatioRes (vect, y1, rng):
-    k, fCalc = 0, 0
+    ka, fCalc = 0, 0
     goldFlag = 0
-    method = 'gold'
     res = results['goldenRes']
-    res.append(iter_info(k))
-    arr = res[k]
-    arr.a, arr.b = -rng, rng
+    res.append(iter_info(ka))
+    arr = res[ka]
+    
+    arr.a, arr.b = min(-rng, rng), max(-rng, rng)
     fCalc += 2
-    arr.calc(method, vect, y1, goldFlag)
-    while arr.b - arr.a > eps:
-        res.append(iter_info(k + 1))
-        arr1 = res[k + 1]
-        arr.calc(method, vect, y1, goldFlag)
+    arr.calc(vect, y1, goldFlag)
+    while abs(arr.b - arr.a) > eps:
+        res.append(iter_info(ka + 1))
+        arr1 = res[ka + 1]
+        arr.calc(vect, y1, goldFlag)
         fCalc += 0
-        match foo:
-            case '1':
-                foper = arr.FMu
-                soper = arr.FLamb
-            case '2':
-                foper = arr.FLamb
-                soper = arr.FMu
+        foper = arr.FLamb
+        soper = arr.FMu
         if foper > soper:
             goldFlag = 1
             fCalc += 1
             arr1.a, arr1.b = arr.Lambda, arr.b
             arr1.Lambda = arr.Mu
             arr1.Mu = (arr1.a + teta * (arr1.b - arr1.a))
-            arr1.calc(method, vect, y1, goldFlag)
+            arr1.calc(vect, y1, goldFlag)
         else:
             goldFlag = 2
             fCalc += 1
             arr1.a, arr1.b = arr.a, arr.Mu
             arr1.Mu = arr.Lambda
             arr1.Lambda = (arr1.a + (1 - teta) * (arr1.b - arr1.a))
-            arr1.calc(method, vect, y1, goldFlag)
+            arr1.calc(vect, y1, goldFlag)
         goldFlag = 0
-        k += 1
-        arr = res[k]
+        ka += 1
+        arr = res[ka]
     
     return [round((abs(arr.a - arr.b)) / 2, roun), arr.Lambda]
 
-def getFoo(lamb=0, d=[0,0], x=[0,0], goal='f'):
-    lamb = lamb
-    func = foon
-    match goal:
-        case 'f':
-            func = foon
-            func = func.replace('x1', str(x[0]))
-            func = func.replace('x2', str(x[1]))
-            a = max((2 * x[0] + x[1] - 2), 0)
-            b = max((-x[1] + 1), 0)
-            func = func.replace('a(x)', str(mu * (a**2 + b**2)))
-            # print(f'func = {func}')
-            res = round(eval(func), roun)
-        case 'e':
-            func1 = str(foon)
-            x1 = '(x[0] + (lamb * d[0]))'
-            x2 = '(x[1] + (lamb * d[1]))'
-            func1 = func1.replace('x1', x1) 
-            func1 = func1.replace('x2', x2)
-            func1 = func1.replace('x[0]', str(x[0]))
-            func1 = func1.replace('x[1]', str(x[1]))
-            func1 = func1.replace('d[0]', str(d[0]))
-            func1 = func1.replace('d[1]', str(d[1]))
-            func1 = func1.replace('lamb', str(lamb))
-            a = max((2 * x[0] + x[1] - 2), 0)
-            b = max((-x[1] + 1), 0)
-            func1 = func1.replace('a(x)', str(mu * (a**2 + b**2)))
-            # print(f'func1 = {func1}, ab = {a, b}')
-            res = round(eval(func1), roun)
-        case 'p':
-            ar = []
-            ar.append(2 * x[0] + x[1] - 2)
-            ar.append(-x[0] + 1)
-            res = ar[0] + ar[1]
-    return res
-
-def printRess(k, x, fx, j, d, y, lamb, y1):
-    if k == 1 and j == 1:
-        print(f'{"":-^86}')
-        print(f'| k  |        xk       |  j  |    dj   |        yj       |  labmj  |       yj+1      |')
-        print(f'{"":-^86}')
-    if j == 1:
-        print(f'|{k:^4}| {x[0]: >7.4f}:{x[1]: >7.4f} | {j: >3.1f} | {d[0]: >3.1f}:{d[1]:.1f} | {x[0]: >7.4f}:{x[1]: >7.4f} | {lamb: >7.4f} | {y1[0]: >7.4f}:{y1[1]: >7.4f} |')
-    elif j == 2:
-        print(f'|{k:^4}| {fx: >15.4f} | {j: >3.1f} | {d[0]: >3.1f}:{d[1]:.1f} | {y[0]: >7.4f}:{y[1]: >7.4f} | {lamb: >7.4f} | {y1[0]: >7.4f}:{y1[1]: >7.4f} |')
-    print(f'{"":-^86}')
+def getFoo(lamb, d, x):
+    x1, x2 = x[0] + (lamb * d[0]), x[1] + (lamb * d[1])
+    return countByChoise(x1, x2)
 
 def countPoint(lamb, y, d):
     y1 = []
@@ -164,52 +85,29 @@ class iter_gaus:
     def newPoint(self, x):
         j = 1
         self.x = x
-        self.fx = getFoo(x=x, goal='f')
+        self.fx = x[0]**2 + x[1]**2 + mu * countPenal(x)
         d = vectors[j-1]
         self.lamb1 = getGoldenRatioRes(d, self.x, self.rng)
         results['goldenRes'] = []
         self.y = countPoint(self.lamb1[1], x, d)
-        self.fy = getFoo(x=self.y, goal='f') 
-        # printRess(self.k, x, self.fx, j, d, x, self.lamb1[1], self.y)
+        self.fy = self.y[0]**2 + self.y[1]**2 + mu * countPenal(self.y)
 
         j += 1
         d = vectors[j-1]
         self.lamb2 = getGoldenRatioRes(d, self.y, self.rng)
         results['goldenRes'] = []
         self.y1 = countPoint(self.lamb2[1], self.y, d)
-        self.fy1 = self.lamb2[1]
-        # printRess(self.k, self.x, self.fx, j, d, self.y, self.lamb2[1], self.y1)
+        self.fy1 = self.y1[0]**2 + self.y1[1]**2 + mu * countPenal(self.y1)
 
         ang = math.sqrt((self.y1[0] - self.x[0])**2 + ((self.y1[1] - self.x[1])**2))
         return ang
 
-def chooseFoo():
-    foos = [
-        '(x1**2 - x2**2 + x1 * x2 - x1 + 2 * x2)',
-        '((x1 - x2)**2 + (x2 - 2)**2)',
-        '(9 * (x1**2) + 16 * (x2**2) - 90 * x1 - 128 * x2)',
-        '((x1 - 2)**4 + (x1 - (2 * x2))**2 + a(x))',
-        '((x1**2 + x2**2) + a(x))'
-    ]
-    print('Choose number of function:')
-    for i in range(len(foos)):
-        print(f'{i+1}. {foos[i]}')
-    choise = int(input('Enter number: ')) 
-    return [foos[choise - 1], choise]
-
-def countByChoise(x1, x2, choise):
-    match choise:
-        case 1:
-            res = (x1**2 - x2**2 + x1 * x2 - x1 + 2 * x2)
-        case 2:
-            res = ((x1 - x2)**2 + (x2 - 2)**2)
-        case 3:
-            res = (9 * (x1**2) + 16 * (x2**2) - 90 * x1 - 128 * x2)
-        case 4:
-            res = ((x1 - 2)**4 + (x1 - (2 * x2))**2)
-        case 5:
-            res = ((x1**2 + x2**2)) + penal# + mu * (max((2 * x1 + x2 - 2)**2, 0) + max((-x2 + 1)**2), 0))
-    return res
+def countByChoise(x1, x2):
+    x = [x1, x2]
+    if finish_flag:
+        return (x1**2 + x2**2)
+    else:
+        return ((x1**2 + x2**2)) + countPenal(x) * mu
 
 def getPoints(ar):
     x_val = []
@@ -225,16 +123,14 @@ def getPoints(ar):
     return x_val, y_val
 
 def buildPlot(arr, rng):
-    rng = 10
+    rng = 5
     px = arr[-1].y1[0]
     py = arr[-1].y1[1]
 
     X_AX = np.arange(px - rng, px + rng + 0.1, 0.1)
     Y_AX = np.arange(py - rng, py + rng + 0.1, 0.1)
     X, Y = np.meshgrid(X_AX, Y_AX)
-    # Z = (X**2 + Y**2) + mu * ((2 * X + Y - 2)**2 + ((-Y + 1)**2))
-    # R = (2 * X + Y - 2)
-    # C = (-Y + 1)
+    # Z = ((2 * X + Y - 2)**2 + ((-Y + 1)**2))
 
     # fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
     # ax.plot_surface(X, Y, Z, vmin=Z.min() * 2, cmap=cm.Blues)
@@ -242,37 +138,34 @@ def buildPlot(arr, rng):
     # ax.set(xticklabels=[],
     #     yticklabels=[],
     #     zticklabels=[])
+
     counted_points = getPoints(arr)
     plt.plot(counted_points[0], counted_points[1], 'bo', linestyle='--')
     plt.plot(px, py, marker='o', markersize=12, markeredgecolor='red', markerfacecolor='yellow')
 
-    C = plt.contour(X, Y, countByChoise(X, Y, choise), 8, colors='black')
-    plt.contourf(X, Y, countByChoise(X, Y, choise), 8)
+    C = plt.contour(X, Y, countByChoise(X, Y), 8, colors='black')
+    plt.contourf(X, Y, countByChoise(X, Y), 8)
     plt.clabel(C, inline=1, fontsize=10)
     plt.colorbar()
 
     plt.show()
 
-# def countPenalty(x, mu):
-    # penalty = [] ((2 * x[0] + x[1] - 2)**2 + (-x[1] + 1)**2)
-    # penalty.append(2 * x[0] + x[1] - 2)
-    # penalty.append(-x[1] + 1)
-    # for i in range(len(penalty)):
-    #     if penalty[i] <= 0:
-    #         penalty[i] = 0
-    # penalty = (penalty[0]**2 + penalty[1]**2) * mu
-    # return penalty
-
+def countPenal(pen):
+    a = max((2 * pen[0] + pen[1] - 2), 0)
+    b = max((-pen[1] + 1), 0)   
+    return (a**2+b**2)
+    
+finish_flag = 0
 gaus_res = []
 rng = 1
-roun = 6
+roun = 4
 vectors = [
     [1, 0],
     [0, 1]
 ]
 k = 0
 ang = 10
-foon, choise = chooseFoo()
+
 x1 = int(input('Enter x1: ')) # 0
 x2 = int(input('Enter x2: ')) # 3
 x = [x1, x2]
@@ -285,31 +178,27 @@ while True:
     k += 1
     gaus_res.append(iter_gaus(k, rng))
     
-
-    if k != 1: 
+    if k != 1:
         ang = gaus_res[-1].newPoint(gaus_res[-2].y1)
-        penal = (max((2 * gaus_res[-1].y1[0] + gaus_res[-1].y1[1] - 2), 0)**2 + max((0 - gaus_res[k-2].y1[1] + 1), 0)**2) * mu
     else:
+        penal = countPenal(x) * mu
         ang = gaus_res[-1].newPoint(x)
-        penal = (max((2 * x[0] + x[1] - 2), 0)**2 + max((0 -x[1] + 1), 0)**2) * mu
+        
     fres = gaus_res[-1].y1[0]**2 + gaus_res[-1].y1[1]**2
-    
 
     if k == 1:
         print('| k   |   mu   |           xk+1          |   f(xk)   |    alfa   |    omega   |  mu_alfa   |')
         print(f'{"":-^92}')
-    print(f'|{k:^4} | {round(mu, roun): >6} | {gaus_res[-1].y1[0]: >11}:{gaus_res[-1].y1[1]: >11} | {round(fres, roun): >9} | {round(penal / mu, roun): >9} | {round(fres + round(penal, roun)): > 10} | {round(penal, roun): >11}|')
+    print(f'|{k:^4} | {round(mu, roun): >6} | {gaus_res[-1].y1[0]: >11}:{gaus_res[-1].y1[1]: >11} | {round(fres, roun): >9} | {round(countPenal(gaus_res[-1].y1), roun): >9} | {round(fres + round(countPenal(gaus_res[-1].y1) * mu, roun)): > 10} | {round(countPenal(gaus_res[-1].y1) * mu, roun): >11}|')
     print(f'{"":-^92}')
 
-    penal = (max((2 * gaus_res[-1].y1[0] + gaus_res[-1].y1[1] - 2), 0)**2 + max((-gaus_res[-1].y1[1] + 1), 0)**2) * mu
-
-    if penal < eps:
+    if countPenal(gaus_res[-1].y1) * mu < eps:
         break 
     else: 
         if k == 1:
-            mu = 1
-        mu = mu * beta
-
-print(gaus_res[-1].y1, round(fres, roun), penal)
+            mu = 0.1
+        mu *= beta
+finish_flag = 1
+# print(gaus_res[-1].y1, round(fres, roun), countPenal(gaus_res[-1].y1) * mu)
 
 buildPlot(gaus_res, rng)

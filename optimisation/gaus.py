@@ -184,7 +184,7 @@ def chooseFoo():
         '(x1**2 - x2**2 + x1 * x2 - x1 + 2 * x2)',
         '((x1 - x2)**2 + (x2 - 2)**2)',
         '(9 * (x1**2) + 16 * (x2**2) - 90 * x1 - 128 * x2)',
-        '((x1 - 2)**4 + (x1 - (2 * x2))**2)'
+        '(x1 - 2)**4 + (x1 - 2 * x2)**2'
     ]
     print('Choose number of function:')
     for i in range(len(foos)):
@@ -201,7 +201,7 @@ def countByChoise(x1, x2, choise):
         case 3:
             res = (9 * (x1**2) + 16 * (x2**2) - 90 * x1 - 128 * x2)
         case 4:
-            res = ((x1 - 2)**4 + (x1 - (2 * x2))**2)
+            res = (x1 - 2)**4 + (x1 - 2 * x2)**2
     return res
 
 def getPoints(ar):
@@ -240,7 +240,7 @@ def buildPlot(arr, rng):
 
 
 gaus_res = []
-rng = 10
+rng = 0.5
 roun = 6
 vectors = [
     [1, 0],
