@@ -130,14 +130,6 @@ def buildPlot(arr, rng):
     X_AX = np.arange(px - rng, px + rng + 0.1, 0.1)
     Y_AX = np.arange(py - rng, py + rng + 0.1, 0.1)
     X, Y = np.meshgrid(X_AX, Y_AX)
-    # Z = ((2 * X + Y - 2)**2 + ((-Y + 1)**2))
-
-    # fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-    # ax.plot_surface(X, Y, Z, vmin=Z.min() * 2, cmap=cm.Blues)
-
-    # ax.set(xticklabels=[],
-    #     yticklabels=[],
-    #     zticklabels=[])
 
     counted_points = getPoints(arr)
     plt.plot(counted_points[0], counted_points[1], 'bo', linestyle='--')
@@ -200,5 +192,5 @@ while True:
         mu *= beta
 finish_flag = 1
 # print(gaus_res[-1].y1, round(fres, roun), countPenal(gaus_res[-1].y1) * mu)
-
+print(f'Optimal value is {gaus_res[-1].y1} in {eps} range\nPenalty in dot = {round(countPenal(gaus_res[-1].y1) * mu, roun)}\nAssistant function in dot = {round(gaus_res[-1].fy1, roun)}')
 buildPlot(gaus_res, rng)
